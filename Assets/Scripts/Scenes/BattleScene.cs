@@ -13,6 +13,7 @@ public class BattleScene : BaseScene
     protected override IEnumerator LoadingRoutine()
     {
         // fake loading
+        Debug.Log("Battle Scene Road Somethings");
         yield return new WaitForSecondsRealtime(0.2f);
         progress = 0.2f;
         yield return new WaitForSecondsRealtime(0.2f);

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class BaseScene : MonoBehaviour
 {
-    //Loading
+    #region Loading
     public float progress { get; protected set; }
     protected abstract IEnumerator LoadingRoutine();
 
@@ -12,8 +12,8 @@ public abstract class BaseScene : MonoBehaviour
     {
         StartCoroutine(LoadingRoutine());
     }
+    #endregion
 
-    //
     protected virtual void Awake()
     {
         Init();
