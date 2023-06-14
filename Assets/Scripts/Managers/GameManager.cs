@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     private static ResourceManager resourceManager;
     public static ResourceManager Resource { get { return resourceManager; } }
 
+    private static UIManager uiManager;
+    public static UIManager UI { get { return uiManager; } }
 
     private GameManager() { }
  
@@ -51,20 +53,25 @@ public class GameManager : MonoBehaviour
     private void InitManagers()
     {
 
-        GameObject dobj = new GameObject();
-        dobj.name = "SceneManagerEX";
-        dobj.transform.SetParent(transform);
-        sceneManager = dobj.AddComponent<SceneManagerEX>();
-
         GameObject resourceObj = new GameObject();
         resourceObj.name = "ResourceManager";
         resourceObj.transform.SetParent(transform);
         resourceManager = resourceObj.AddComponent<ResourceManager>();
-
+        
         GameObject poolObj = new GameObject();
         poolObj.name = "PoolManager";
         poolObj.transform.SetParent(transform);
         poolManager = poolObj.AddComponent<PoolManager>();
+
+        GameObject uiObj = new GameObject();
+        uiObj.name = "UIManager";
+        uiObj.transform.parent = transform;
+        uiManager = uiObj.AddComponent<UIManager>();
+        
+        GameObject sObj = new GameObject();
+        sObj.name = "SceneManagerEX";
+        sObj.transform.SetParent(transform);
+        sceneManager = sObj.AddComponent<SceneManagerEX>();
 
     }
 }

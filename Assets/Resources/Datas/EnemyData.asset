@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35253a151fdc7e44b84a4a6f79944413, type: 3}
   m_Name: EnemyData
   m_EditorClassIdentifier: 
-  enemys: []
+  enemys:
+  - enemyPrefab: {fileID: 0}
+    name: 
+    MaxHP: 0
+    MaxSP: 0

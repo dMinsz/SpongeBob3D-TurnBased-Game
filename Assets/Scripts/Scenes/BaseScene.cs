@@ -4,9 +4,17 @@ using UnityEngine;
 
 public abstract class BaseScene : MonoBehaviour
 {
-    //public SceneDefine.Scene SceneType { get; protected set; } = SceneDefine.Scene.Unknown; // 디폴트로 Unknow 이라고 초기화
+    //Loading
+    public float progress { get; protected set; }
+    protected abstract IEnumerator LoadingRoutine();
 
-    void Awake()
+    public void LoadAsync()
+    {
+        StartCoroutine(LoadingRoutine());
+    }
+
+    //
+    protected virtual void Awake()
     {
         Init();
     }
