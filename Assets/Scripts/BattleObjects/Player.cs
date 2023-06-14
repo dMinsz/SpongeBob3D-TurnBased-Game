@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class Player : Unit
 {
-   
 
-    // Start is called before the first frame update
     void Start()
     {
         
@@ -20,16 +18,16 @@ public class Player : Unit
 
     public override void Attack(int damage)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public override void DoSkill()
     {
-        throw new System.NotImplementedException();
+       
     }
 
     public override void TakeDamage(int damage)
     {
-        throw new System.NotImplementedException();
+        
     }
 }

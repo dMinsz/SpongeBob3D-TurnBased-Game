@@ -235,10 +235,16 @@ MonoBehaviour:
   state: 0
   playerBattleStation:
   - {fileID: 1608058164}
+  - {fileID: 1496360009}
+  - {fileID: 1968921370}
+  - {fileID: 1736923242}
   enemyBattleStation:
   - {fileID: 586270429}
+  - {fileID: 805591378}
+  - {fileID: 1688445899}
   playerDatas: {fileID: 0}
   enemyDatas: {fileID: 0}
+  waveData: {fileID: 0}
 --- !u!4 &678252765
 Transform:
   m_ObjectHideFlags: 0

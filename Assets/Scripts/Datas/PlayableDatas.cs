@@ -14,7 +14,7 @@ public class PlayableDatas : ScriptableObject
     public class PlayableInfo
     {
         [Header("Prefab")]
-        public Player player;
+        public Player PreFab;
 
         public Sprite CharacterIamge;
 

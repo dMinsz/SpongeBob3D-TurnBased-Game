@@ -27,7 +27,6 @@ public class GameManager : MonoBehaviour
     private GameManager() { }
  
 
-
     private void Awake() // 유니티에서는 에디터상에서 추가할수 있기때문에 이런식으로구현
     {
         if (instance != null)

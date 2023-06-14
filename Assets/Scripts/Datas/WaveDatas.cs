@@ -7,13 +7,13 @@ using static EnemyDatas;
 [CreateAssetMenu(fileName = "WaveDatas", menuName = "Data/Wave")]
 public class WaveDatas : ScriptableObject
 {
-    [SerializeField] public WaveInfo[] waves;
-    public WaveInfo[] Waves { get { return waves; } }
+    [SerializeField] public List<WaveInfo> waves = new List<WaveInfo>();
+    public List<WaveInfo> Waves { get; set; }
 
     [Serializable]
     public class WaveInfo
     {
         [Header("Wave Monsters")]
-        public List<EnemyInfo> Wave;
+        public List<EnemyInfo> EnemyList = new List<EnemyInfo>();
     }
 }

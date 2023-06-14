@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PartyElementUI : BaseUI
 {
+    
     public Dictionary<string, Image> Images = new Dictionary<string, Image>();
     protected override void Awake()
     {
+        base.BindChildren();
         BindChildren();
     }
 
@@ -33,6 +36,7 @@ public class PartyElementUI : BaseUI
             {
                 Images.Add(key, image);
             }
+
 
         }
     }

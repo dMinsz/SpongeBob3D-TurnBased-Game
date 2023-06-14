@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayableDatas
   m_EditorClassIdentifier: 
   players:
-  - player: {fileID: 9029146916619788460, guid: 528d8634dc718124081b04664f558039, type: 3}
+  - PreFab: {fileID: 9029146916619788460, guid: 528d8634dc718124081b04664f558039, type: 3}
     CharacterIamge: {fileID: 35081074, guid: c43091df4b03c8247b12fa27e8939868, type: 3}
     name: Player1
     MaxHP: 10

@@ -8,7 +8,7 @@ public class BaseUI : MonoBehaviour
     protected Dictionary<string, RectTransform> transforms; //모든 UI의 상위 부모 역할
 
     protected Dictionary<string, Button> buttons;
-    protected Dictionary<string, TMP_Text> texts;
+    public Dictionary<string, TMP_Text> texts;
 
     protected virtual void Awake()
     {
