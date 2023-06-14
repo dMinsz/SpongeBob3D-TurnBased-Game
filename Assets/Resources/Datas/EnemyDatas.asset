@@ -10,10 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35253a151fdc7e44b84a4a6f79944413, type: 3}
-  m_Name: EnemyData
+  m_Name: EnemyDatas
   m_EditorClassIdentifier: 
   enemys:
-  - enemyPrefab: {fileID: 0}
-    name: 
-    MaxHP: 0
-    MaxSP: 0
+  - enemyPrefab: {fileID: 2207862217511537021, guid: 7e635106e7a028f4a8fcb9336c8ba6b6, type: 3}
+    name: Enemy1
+    MaxHP: 10
+    MaxSP: 10
+  - enemyPrefab: {fileID: 2207862217511537021, guid: 7e635106e7a028f4a8fcb9336c8ba6b6, type: 3}
+    name: Enemy2
+    MaxHP: 10
+    MaxSP: 10

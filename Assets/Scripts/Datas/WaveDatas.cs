@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static MonsterDatas;
+using static EnemyDatas;
 
 [CreateAssetMenu(fileName = "WaveDatas", menuName = "Data/Wave")]
 public class WaveDatas : ScriptableObject

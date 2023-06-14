@@ -18,4 +18,12 @@ MonoBehaviour:
       name: 
       MaxHP: 0
       MaxSP: 0
-  - Wave: []
+  - Wave:
+    - enemyPrefab: {fileID: 0}
+      name: 
+      MaxHP: 0
+      MaxSP: 0
+    - enemyPrefab: {fileID: 0}
+      name: 
+      MaxHP: 0
+      MaxSP: 0

@@ -8,13 +8,18 @@ public class BattleScene : BaseScene
     {
         base.Awake();
         Debug.Log("Battle Scene Init");
+        
+        //Debug
+        //BattleManager.Instance.Setup();
     }
 
     protected override IEnumerator LoadingRoutine()
     {
         // fake loading
         Debug.Log("Battle Scene Road Somethings");
-        yield return new WaitForSecondsRealtime(0.2f);
+
+        BattleManager.Instance.Setup();
+
         progress = 0.2f;
         yield return new WaitForSecondsRealtime(0.2f);
         progress = 0.4f;

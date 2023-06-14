@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "EnemyDatas", menuName = "Data/Enemy")]
-public class MonsterDatas : ScriptableObject
+public class EnemyDatas : ScriptableObject
 {
     [SerializeField] public EnemyInfo[] enemys;
     public EnemyInfo[] Enemys { get { return enemys; } }

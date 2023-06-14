@@ -7,10 +7,15 @@ public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
 public class BattleManager : MonoBehaviour
 {
-
     #region Singleton
     private static BattleManager instance;
-    public static BattleManager Instance { get { return instance; } }
+    public static BattleManager Instance 
+    { 
+        get 
+        {
+            return instance; 
+        } 
+    }
 
     private BattleManager() { }
 
@@ -39,21 +44,42 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField]private BattleState state;
 
-    public List<GameObject> playerPrefab;
-    public List<GameObject> enemyPrefab;
+    //public List<GameObject> playerPrefabs;
+    //public List<GameObject> enemyPrefabs;
 
     public Transform[] playerBattleStation;
     public Transform[] enemyBattleStation;
 
-    List<Unit> playerUnit;
-    List<Unit> enemyUnit;
-    private void Setup()
+    [HideInInspector] public PlayableDatas playerDatas;
+    [HideInInspector] public EnemyDatas enemyDatas;
+
+    List<Unit> playerUnits;
+    List<Unit> enemyUnits;
+    
+    public void Setup()
     {
+        playerUnits = new List<Unit>();
+
         state = BattleState.START;
 
-        //TODO::
+        //Data Bind
+
+        playerDatas = GameManager.Resource.Load<PlayableDatas>("Datas/PlayableDatas");
+        enemyDatas = GameManager.Resource.Load<EnemyDatas>("Datas/EnemyDatas");
 
         //Init Enemy and Player
+        foreach (var player in playerDatas.players) 
+        {
+            Player temp = new Player();
+            temp.unitName = player.name;
+            temp.MaxHP = player.MaxHP;
+            temp.curHP = player.MaxHP;
+            temp.MaxSP = player.MaxSP;
+            temp.curSP = player.MaxSP;
+            playerUnits.Add(temp);
+        }
+
+
 
         //getComponent unit and Status set
     }
