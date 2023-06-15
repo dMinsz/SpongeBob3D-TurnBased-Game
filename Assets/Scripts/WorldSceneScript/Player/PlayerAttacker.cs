@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerAttacker : MonoBehaviour
@@ -8,11 +9,9 @@ public class PlayerAttacker : MonoBehaviour
     [SerializeField] bool debug;
 
     [SerializeField] float range;
-    [SerializeField] int damage;
     [SerializeField, Range(0, 360)] float angle;
 
     private Animator animator;
-    private float cosResult;
 
     private void Awake()
     {
@@ -43,7 +42,7 @@ public class PlayerAttacker : MonoBehaviour
                 continue;                                                              // È£µµ¹ý
 
             IHittable hittable = collider.GetComponent<IHittable>();
-            hittable?.TakeHit(damage);
+            hittable?.TakeHit();
         }
     }
 

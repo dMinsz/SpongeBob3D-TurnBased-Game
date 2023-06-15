@@ -10,20 +10,53 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] Transform point;
     [SerializeField] float range;
 
+    private Animator animator;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     public void Interact()
     {
         Collider[] colliders = Physics.OverlapSphere(point.position, range);
 
         foreach (Collider collider in colliders)
         {
-            IInteractable interactable = collider.GetComponent<IInteractable>();
-            interactable?.Interact();
+            if(collider.tag != "Enemy")
+            {
+                IInteractable interactable = collider.GetComponent<IInteractable>();
+                interactable?.Interact();
+            }
         }
     }
 
     private void OnInteract(InputValue value)
     {
         Interact();
+        Debug.Log("상호작용 키 누름");
+    }
+
+    private void Attack()
+    {
+        animator.SetTrigger("Attack");
+    }
+
+    private void AttackInteract()
+    {
+        Collider[] colliders = Physics.OverlapSphere(point.position, range);
+
+        foreach (Collider collider in colliders)
+        {
+            IHittable hittable = collider.GetComponent<IHittable>();
+            hittable?.TakeHit();
+        }
+    }
+
+    private void OnAttack(InputValue value)
+    {
+        AttackInteract();
+        Attack();
     }
 
     private void OnDrawGizmosSelected()
