@@ -26,6 +26,9 @@ public class PlayerMover : MonoBehaviour
 
     private void Move()
     {
+        if (moveDir.magnitude == 0)
+            return;
+
         Vector3 forwardVec = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
         Vector3 rightVec = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 
@@ -34,6 +37,9 @@ public class PlayerMover : MonoBehaviour
         // animator.SetFloat("MoveSpeed", curSpeed);
 
         Quaternion lookRotation = Quaternion.LookRotation(forwardVec * moveDir.z + rightVec * moveDir.x);
+        // Debug.Log(forwardVec);
+        // Debug.Log(rightVec);
+        // Debug.Log(lookRotation);
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 0.05f);
 
     }
