@@ -6,6 +6,6 @@ public class WorldEnemy : MonoBehaviour
 {
     public void Interactor()
     {
-        Debug.Log("LoadingSceneChange");
+        Debug.Log("BattleSceneChange");
     }
 }
