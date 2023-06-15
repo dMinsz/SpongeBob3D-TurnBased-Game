@@ -20,6 +20,8 @@ public class EnemyDatas : ScriptableObject
         public string name;
         public int MaxHP;
         public int MaxSP;
+        public int AttackDamage;
+        public int SkillDamage;
     }
 
 }

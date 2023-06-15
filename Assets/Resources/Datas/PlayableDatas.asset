@@ -18,3 +18,5 @@ MonoBehaviour:
     name: Player1
     MaxHP: 10
     MaxSP: 10
+    AttackDamage: 5
+    SkillDamage: 10

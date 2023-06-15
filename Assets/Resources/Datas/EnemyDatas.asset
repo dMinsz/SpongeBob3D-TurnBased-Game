@@ -17,7 +17,11 @@ MonoBehaviour:
     name: Enemy1
     MaxHP: 10
     MaxSP: 10
+    AttackDamage: 1
+    SkillDamage: 2
   - enemyPrefab: {fileID: 2207862217511537021, guid: 7e635106e7a028f4a8fcb9336c8ba6b6, type: 3}
     name: Enemy2
     MaxHP: 10
     MaxSP: 10
+    AttackDamage: 2
+    SkillDamage: 3

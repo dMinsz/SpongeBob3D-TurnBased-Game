@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
-//ÀûÀº ÃÖ´ë ¼Â
-public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
+
+public enum BattleState { START, PLAYERTURN, ENEMYTURN, WAVE, WON, LOST }
 
 
 public class Wave
@@ -12,14 +14,16 @@ public class Wave
 }
 public class BattleManager : MonoBehaviour
 {
+    public bool isDebug = false;
+
     #region Singleton
     private static BattleManager instance;
-    public static BattleManager Instance 
-    { 
-        get 
+    public static BattleManager Instance
+    {
+        get
         {
-            return instance; 
-        } 
+            return instance;
+        }
     }
 
     private BattleManager() { }
@@ -38,41 +42,54 @@ public class BattleManager : MonoBehaviour
 
         instance = this;
 
-        //Debug¿ë
-        Setup();
+        //Debugï¿½ï¿½
+        if (isDebug == true)
+        {
+            Setup();
+        }
     }
     private void OnDestroy()
     {
+
         if (instance == this)
             instance = null;
     }
     #endregion
 
-    [SerializeField]private BattleState state = BattleState.START;
+    [SerializeField] private BattleState state = BattleState.START;
+
+    public BattleState GetState() { return state; }
 
     public Transform[] playerBattleStation;
     public Transform[] enemyBattleStation;
-    
+
     [HideInInspector] public PlayableDatas playerDatas;
     [HideInInspector] public EnemyDatas enemyDatas;
 
-    List<Unit> playerUnits;
-    List<Unit> enemyUnits;
+    public List<Player> playerUnits;
+    List<Enemy> enemyUnits;
 
-    EnemyDatas.EnemyInfo encounteredUnit; // ¸¶ÁÖÄ£ Àû
+    EnemyDatas.EnemyInfo encounteredUnit; 
+
+    Enemy targetEnemy;
+    public Player targetPlayer;
 
     //Monster Wave
     private const int MAXWAVE = 3;
-    private int waveCount = 0;
-    private int curWave = 0;
+    private int waveCount = 2;
+    private int MaxEachEnemyCount = 2;
+    private int MaxTypeNum = 1;
 
-    public WaveDatas waveData; // ÀüÃ¼ ¿þÀÌºêµ¥ÀÌÅÍ ÀúÀå¿ë
-    public List<Wave> _wave = new List<Wave>();
-    //
-    private bool isSetUp = false;
+    public int curentWave = 0;
 
-    //¾À³Ñ°ÜÁÙ¶§ ¾Æ·¡ÀÇ ÇÔ¼ö´Â ½ÇÇà½ÃÄÑÁà¾ßÇÔ
-    public void BattleStart(BattleState _state, EnemyDatas.EnemyInfo _encounteredUnit , int _waveCount) 
+    //public WaveDatas waveData; 
+    public List<Wave> _wave;
+
+
+
+    Coroutine TurnRoutine;
+
+    public void SettingBattle(BattleState _state, EnemyDatas.EnemyInfo _encounteredUnit, int _waveCount)
     {
         state = _state;
         encounteredUnit = _encounteredUnit;
@@ -81,72 +98,92 @@ public class BattleManager : MonoBehaviour
         {
             waveCount = _waveCount;
         }
-        else 
+        else
         {
             waveCount = MAXWAVE;
         }
     }
 
-    //¿þÀÌºê ¸¸µé±â
-    //error
-    public void AddWave(int waveNum,int enemyNum) 
+    #region Target Funcs
+    public bool IsTargeting()
     {
-        if (!isSetUp)
+        if (targetEnemy != null)
         {
-            Debug.LogWarning("Error : BattleManager Setup is not done");
-            return;
+            return true;
         }
-
-        if (waveNum > MAXWAVE - 1)
-        {
-            Debug.LogWarning("Error : Invalid Wave Num");
-            return;
-        }
-
-        //enemy »ý¼º
-        EnemyDatas.EnemyInfo tempEnemy;
-        tempEnemy = enemyDatas.Enemys[enemyNum];
-
-        
-        if (tempEnemy == null)
-        {//À¯¿äÇÑ ¿¡³Ê¹Ì ¹øÈ£°¡ ¾Æ´Ò¶§
-            Debug.LogWarning("Error : BattleManager.AddWave() Enemy datas Null");
-            return;
-        }
-
-        //¿þÀÌºê »ý¼º
-        if (waveData.Waves.Count >= waveNum + 1 && waveData.Waves.Count != 0)
-        {
-            waveData.Waves[waveNum].EnemyList.Add(tempEnemy);
-        }
-        else
-        {
-            WaveDatas.WaveInfo tempWave = new WaveDatas.WaveInfo();
-            tempWave.EnemyList.Add(tempEnemy);
-
-            waveData.Waves.Add(tempWave);
-        }
-
-        waveCount++;
-
+        return false;
     }
 
-    public void MakeWave(int maxWaveCount, int maxEnemyTypeNum , int maxEachEnemyCount)
+    public void FreeTarget(Enemy target)
     {
-        //¹üÀ§ ¿¡·¯ Á¶½É
+        targetEnemy = null;
+    }
+    public void FreeTarget(Player target)
+    {
+        targetPlayer = null;
+    }
+
+    public void SetTaget(Enemy target)
+    {
+        targetEnemy = target;
+    }
+
+    public void SetTaget(Player target)
+    {
+        targetPlayer = target;
+    }
+
+    public Player GetTargetedPlayer()
+    {
+        return targetPlayer;
+    }
+    public Enemy GetTargetedEnemy()
+    {
+        return targetEnemy;
+    }
+    #endregion
+    public void SetEnemysRotation()
+    {
+        foreach (var enemy in enemyUnits)
+        {
+            enemy.transform.LookAt(targetPlayer.transform.position);
+        }
+    }
+
+    public void SetPlayersRotation()
+    {
+        foreach (var player in playerUnits)
+        {
+            player.transform.LookAt(targetEnemy.transform.position);
+        }
+    }
+
+   
+    public void MakeWave(int maxWaveCount, int maxEnemyTypeNum, int maxEachEnemyCount)
+    {
+
+        if (curentWave > MAXWAVE)
+        {
+            Debug.Log("Make Wave Too Much");
+            return;
+        }
+
+        
+        _wave = new List<Wave>();
 
         int curWave = 0;
 
-        while (curWave < maxWaveCount) 
+        while (curWave < maxWaveCount)
         {
-            int EachWaveEnemyCount = Random.Range(1, maxEachEnemyCount+1);
-            //int EachWaveEnemyCount = 2;
-            int index = Random.Range(0, maxEnemyTypeNum); //maxEnemyNum Àº Æ÷ÇÔ¾ÈÇÔ ÃÊ°úÀÓ
-            
+            //int EachWaveEnemyCount = Random.Range(1, maxEachEnemyCount+1);
+            //test
+            int EachWaveEnemyCount = 3;
+            int index = Random.Range(0, maxEnemyTypeNum + 1); //maxEnemyNum ï¿½ï¿½ ï¿½ï¿½ï¿½Ô¾ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½ï¿½ï¿½
+
             Wave temp = new Wave();
             temp.EnemyList = new List<EnemyDatas.EnemyInfo>();
             _wave.Add(temp);
-            
+
             //_wave[curWave].EnemyList = new List<EnemyDatas.EnemyInfo>();
 
             for (int i = 0; i < EachWaveEnemyCount; i++)
@@ -155,22 +192,24 @@ public class BattleManager : MonoBehaviour
             }
             curWave++;
         }
+
+        curentWave++;
     }
 
     public void Setup()
     {
-        isSetUp = true;
+        //isSetUp = true;
 
-        playerUnits = new List<Unit>();
-        enemyUnits = new List<Unit>();
+        playerUnits = new List<Player>();
+        enemyUnits = new List<Enemy>();
 
         //Data Bind
 
         playerDatas = GameManager.Resource.Load<PlayableDatas>("Datas/PlayableDatas");
         enemyDatas = GameManager.Resource.Load<EnemyDatas>("Datas/EnemyDatas");
-        //waveData = GameManager.Resource.Load<WaveDatas>("Datas/WaveDatas");
 
-        //debug ¿ë
+
+        //debug 
         if (encounteredUnit == null)
         {
             encounteredUnit = enemyDatas.enemys[0];
@@ -179,27 +218,35 @@ public class BattleManager : MonoBehaviour
         //wave Binding
 
         //Test Data
-        MakeWave(2, 1 , 3);
+        //private int waveCount = 2;
+        //private int MaxEachEnemyCount = 2;
+        //private int MaxTypeNum = 1;
+        MakeWave(waveCount, MaxTypeNum, MaxEachEnemyCount);
 
 
         //Init Enemy and Player
+
+
         for (int i = 0; i < playerDatas.players.Length; i++)
         {
             Player temp = GameManager.Resource.Instantiate(playerDatas.players[i].PreFab, playerBattleStation[i].position, Quaternion.identity);
             //temp.transform.position = playerBattleStation[i].position;
 
-            
+
             temp.unitName = playerDatas.players[i].name;
             temp.MaxHP = playerDatas.players[i].MaxHP;
             temp.curHP = playerDatas.players[i].MaxHP;
             temp.MaxSP = playerDatas.players[i].MaxSP;
             temp.curSP = playerDatas.players[i].MaxSP;
+            temp.AttackDamage = playerDatas.players[i].AttackDamage;
+            temp.SkillDamage = playerDatas.players[i].SkillDamage;
             playerUnits.Add(temp);
         }
 
+       
+        SetTaget(playerUnits[0]);
 
-        //Ã¹ ¿þÀÌºê¸¸ ¸¸µé¾îµÐ´Ù
-
+        //Enemy Position and Data Setting
         for (int i = 0; i < _wave[0].EnemyList.Count; i++)
         {
             Enemy temp = GameManager.Resource.Instantiate(_wave[0].EnemyList[i].enemyPrefab, enemyBattleStation[i].position, Quaternion.identity);
@@ -210,10 +257,127 @@ public class BattleManager : MonoBehaviour
             temp.MaxSP = _wave[0].EnemyList[i].MaxSP;
             temp.curHP = _wave[0].EnemyList[i].MaxHP;
             temp.curSP = _wave[0].EnemyList[i].MaxSP;
+            temp.AttackDamage = _wave[0].EnemyList[i].AttackDamage;
+            temp.SkillDamage = _wave[0].EnemyList[i].SkillDamage;
+
+            temp.transform.LookAt(targetPlayer.transform.position);
 
             enemyUnits.Add(temp);
         }
 
-        curWave = 1;
+        SetTaget(enemyUnits[0]);
+
+        SetPlayersRotation();
+
+        FreeTarget(enemyUnits[0]);
+
+        if (state == BattleState.START)
+        {
+            TurnRoutine = StartCoroutine(EnemyTurn());
+        }
+    }
+
+
+
+    public void OnPlayerAttack()
+    {
+
+    }
+
+    public void PlayerTurn()
+    {
+        StopCoroutine(TurnRoutine);
+
+        //Menu hud Open
+        GameObject canvas = GameObject.Find("BattleCanvas");
+        var BattleUI = canvas.transform.Find("BattleUI");
+        var MenuUI = BattleUI.transform.Find("SelectMenuUI");
+        MenuUI.gameObject.SetActive(true);
+
+    }
+
+    bool IsEnemyMovedone = false;
+
+    void EnemyMove(Vector3 target, Transform enemy)
+    {
+        while (true)
+        {
+            enemy.LookAt(target);
+            Vector3 dir = (target - enemy.position).normalized;
+            float speed = 1f;
+            var attackRange = 2;
+            enemy.position += dir * speed * Time.deltaTime;
+            var distance = Vector3.Distance(target, enemy.position);
+
+
+            if (attackRange > distance)
+            {
+                if (distance <= 0.1f)
+                {
+                    IsEnemyMovedone = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    IEnumerator EnemyTurn()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        Player temp = new Player();
+        int hp = int.MaxValue;
+
+        //hp ê°€ìž¥ë‚®ì€ê±° ì°¾ì•„ë‚´ê¸°
+        foreach (var player in playerUnits)
+        {
+            if (player.curHP < hp)
+            {
+                hp = player.curHP;
+                temp = player;
+            }
+
+        }
+
+        foreach (Enemy enemy in enemyUnits)
+        {
+            Vector3 tempPos = enemy.transform.position;
+
+            EnemyMove(temp.transform.position, enemy.transform);// ìºë¦­í„°ì—ê²Œ ê³µê²©ë¬´ë¸Œ
+
+            if (IsEnemyMovedone == true)
+                IsEnemyMovedone = false;
+            else
+                continue;
+
+            enemy.Attack(enemy.AttackDamage, temp);
+            
+            yield return new WaitForSeconds(0.2f);
+            EnemyMove(tempPos, enemy.transform);//ë‹¤ì‹œëŒì•„ê°€ê¸° 
+
+            if (IsEnemyMovedone == true)
+                IsEnemyMovedone = false;
+            else
+                continue;
+
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        state = BattleState.PLAYERTURN;
+
+        PlayerTurn();
+
+        yield return null;
+    }
+
+    public void EndBattle()
+    {
+        if (state == BattleState.WON)
+        {
+
+        }
+        else if (state == BattleState.LOST)
+        {
+        }
     }
 }
