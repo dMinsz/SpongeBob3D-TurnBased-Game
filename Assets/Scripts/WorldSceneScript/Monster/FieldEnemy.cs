@@ -5,9 +5,15 @@ using UnityEngine.Events;
 using EnemyState;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.Burst.Intrinsics;
+using UnityEngine.AI;
+using System.Net;
 
 public class FieldEnemy : MonoBehaviour
 {
+    [SerializeField] public Transform patrolPoint;
+    [SerializeField] public Transform enemySpawnPoint;
+
+    public NavMeshAgent agent;
     private Animator animator;
     private StateBaseFieldEnemy[] states;
     private StateEnemy curState;
@@ -15,6 +21,7 @@ public class FieldEnemy : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
 
         states = new StateBaseFieldEnemy[(int)StateEnemy.Size];
         states[(int)StateEnemy.Idle] = new IdleState(this);
@@ -60,7 +67,7 @@ namespace EnemyState
 
         public override void Enter()
         {
-            Debug.Log("대기진입");
+            Debug.Log("Enter Idle");
             idleTime = 0;
         }
 
@@ -68,7 +75,7 @@ namespace EnemyState
         {
             idleTime += Time.deltaTime;
 
-            if (idleTime > 5)
+            if (idleTime > 3)
             {
                 idleTime = 0;
                 fieldEnemy.ChangeState(StateEnemy.Patrol);
@@ -77,13 +84,15 @@ namespace EnemyState
 
         public override void Exit()
         {
-            
+            Debug.Log("Exit Idle");
         }
     }
 
     public class PatrolState : StateBaseFieldEnemy
     {
         private FieldEnemy fieldEnemy;
+
+        private Transform curPoint;
 
         public PatrolState(FieldEnemy fieldEnemy)
         {
@@ -92,17 +101,24 @@ namespace EnemyState
 
         public override void Enter()
         {
+            Debug.Log("Enter Patrol");
 
+            curPoint = Vector3.Distance(fieldEnemy.transform.position, fieldEnemy.patrolPoint.position) > Vector3.Distance(fieldEnemy.transform.position, fieldEnemy.enemySpawnPoint.position) ? 
+            fieldEnemy.patrolPoint : fieldEnemy.enemySpawnPoint;
+            fieldEnemy.agent.destination = curPoint.position;
         }
 
         public override void Update()
         {
-
+            if (Vector3.Distance(fieldEnemy.transform.position, curPoint.position) < 0.5f)
+            {
+                fieldEnemy.ChangeState(StateEnemy.Idle);
+            }
         }
 
         public override void Exit()
         {
-
+            Debug.Log("Exit Patrol");
         }
     }
 
