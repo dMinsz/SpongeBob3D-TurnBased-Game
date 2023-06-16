@@ -37,8 +37,8 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnInteract(InputValue value)
     {
-        Interact();
         Debug.Log("상호작용 키 누름");
+        Interact();
     }
 
     private void Attack()
