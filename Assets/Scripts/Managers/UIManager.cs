@@ -7,18 +7,15 @@ public class UIManager : MonoBehaviour
 {
     private EventSystem eventSystem;
 
-    private Canvas mainCanvas;
+    public Canvas mainCanvas;
 
     private Canvas inGameCanvas;
 
-
-
-    void Start()
+    void Awake()
     {
         //Make Event System for UI to Start Time
         eventSystem = GameManager.Resource.Instantiate<EventSystem>("PreFabs/UI/EventSystem");
         eventSystem.transform.parent = transform;
-
 
         mainCanvas = GameManager.Resource.Instantiate<Canvas>("PreFabs/UI/Canvas");
         mainCanvas.gameObject.name = "MainCanvas";
@@ -29,7 +26,7 @@ public class UIManager : MonoBehaviour
         inGameCanvas.sortingOrder = 0;
     }
 
-    //InGameUI
+    #region IngameUI
     public T ShowInGameUI<T>(T gameUi) where T : InGameUI
     {
         T ui = GameManager.Pool.GetUI(gameUi);
@@ -58,4 +55,5 @@ public class UIManager : MonoBehaviour
             GameManager.Pool.ReleaseUI(inGameUI.gameObject);
         }
     }
+    #endregion
 }

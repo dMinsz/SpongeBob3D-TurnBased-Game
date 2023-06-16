@@ -32,7 +32,7 @@ public class TitleScene : BaseScene
 
     public void OnStartButton()
     {
-        GameManager.Scene.LoadScene("BattleScene");
+        GameManager.Scene.LoadScene("WolrdScene");
     }
 
     public override void Clear()

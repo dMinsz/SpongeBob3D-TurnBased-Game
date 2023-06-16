@@ -67,7 +67,7 @@ public class SceneManagerEX : MonoBehaviour
         Time.timeScale = 0f; // Loading Áß¿¡´Â ½Ã°£ ¸ØÃã
         
         loadingUI.SetProgress(0f);
-        loadingUI.FadeOut();
+        //loadingUI.FadeOut();
 
         yield return new WaitForSecondsRealtime(0.5f); // Wait fade out
 
@@ -87,12 +87,12 @@ public class SceneManagerEX : MonoBehaviour
         }
       
         //oper.allowSceneActivation = true;
-        Time.timeScale = 1f;
-
         loadingUI.SetProgress(1f);
         loadingUI.FadeIn();
 
+
         yield return new WaitForSecondsRealtime(0.5f); // wait Fade In
+        Time.timeScale = 1f;
     }
 
     public void Clear()
