@@ -377,7 +377,7 @@ public class BattleManager : MonoBehaviour
     //bool isPlayerAttackDone = false;
     IEnumerator PlayerMoveAndAttack() 
     {
-        SkillUI.gameObject.SetActive(false);
+        //SkillUI.gameObject.SetActive(false);
         yield return new WaitForSeconds(0.5f);
 
         while (true)
@@ -449,7 +449,9 @@ public class BattleManager : MonoBehaviour
 
     public void PlayerTurn()
     {
-        if(TurnRoutine != null)
+        SkillUI.gameObject.SetActive(false);
+
+        if (TurnRoutine != null)
             StopCoroutine(TurnRoutine);
 
         //Menu hud Open
@@ -494,6 +496,7 @@ public class BattleManager : MonoBehaviour
 
     public void EnemyTurn()
     {
+        SkillUI.gameObject.SetActive(false);
         StopCoroutine(TurnRoutine);
 
         StartCoroutine(EnemyTurnRoutine());

@@ -1845,7 +1845,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: b926999a49ce2c74eb1d8e41c8806e69, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -1977,6 +1977,7 @@ MonoBehaviour:
   OnSpChanged:
     m_PersistentCalls:
       m_Calls: []
+  animator: {fileID: 0}
 --- !u!1 &7794420336055157419
 GameObject:
   m_ObjectHideFlags: 0

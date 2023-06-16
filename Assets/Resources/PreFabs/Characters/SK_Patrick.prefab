@@ -1784,6 +1784,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8796765979907201870}
   - component: {fileID: 3239294131681476916}
+  - component: {fileID: -1437140456042971867}
   m_Layer: 0
   m_Name: SK_Patrick
   m_TagString: Untagged
@@ -1821,7 +1822,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: efc921afb8cff7d429c6db02dd78ad55, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -1829,6 +1830,32 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-1437140456042971867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8169446855712457204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44890e7fe51bad948b3045f79f519dcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitName: 
+  MaxHP: 0
+  curHP: 0
+  MaxSP: 0
+  curSP: 0
+  AttackDamage: 0
+  SkillDamage: 0
+  OnHpChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnSpChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  animator: {fileID: 0}
 --- !u!1 &8240648069002537125
 GameObject:
   m_ObjectHideFlags: 0
