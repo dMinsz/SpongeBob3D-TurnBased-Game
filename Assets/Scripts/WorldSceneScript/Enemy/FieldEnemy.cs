@@ -121,6 +121,7 @@ namespace EnemyState
         {
             Debug.Log("Enter Idle");
             idleTime = 0;
+            fieldEnemy.animator.SetBool("Idle", true);
         }
 
         public override void Update_()
@@ -140,6 +141,7 @@ namespace EnemyState
         public override void Exit()
         {
             Debug.Log("Exit Idle");
+            fieldEnemy.animator.SetBool("Idle", false);
         }
     }
 
@@ -161,7 +163,9 @@ namespace EnemyState
             curPoint = Vector3.Distance(fieldEnemy.transform.position, fieldEnemy.patrolPoint.position) 
                 > Vector3.Distance(fieldEnemy.transform.position, fieldEnemy.enemySpawnPoint.position) ? 
                 fieldEnemy.patrolPoint : fieldEnemy.enemySpawnPoint;
+
             fieldEnemy.agent.destination = curPoint.position;
+            fieldEnemy.animator.SetBool("Walk", true);
         }
 
         public override void Update_()
@@ -178,6 +182,7 @@ namespace EnemyState
         public override void Exit()
         {
             Debug.Log("Exit Patrol");
+            fieldEnemy.animator.SetBool("Walk", false);
         }
     }
 
@@ -204,8 +209,6 @@ namespace EnemyState
 
                 if (Vector3.Distance(player.transform.position, fieldEnemy.transform.position) < 2f)
                 {
-                    fieldEnemy.animator.SetTrigger("Attack");
-
                     AttackTaiming();
                 }
             }
@@ -221,7 +224,8 @@ namespace EnemyState
                 if(collider.tag != player.tag)
                     continue;
 
-                Debug.Log("FieldEnemy에서 플레이어 어택 발동");
+                Debug.Log("FieldEnemy에서 플레이어 어택 발동, 애니메이션");
+                fieldEnemy.animator.SetTrigger("Attack");
                 IHittable hittable = collider.GetComponent<IHittable>();
                 hittable?.TakeHit();
             }
@@ -247,6 +251,7 @@ namespace EnemyState
         public override void Enter()
         {
             fieldEnemy.agent.destination = fieldEnemy.transform.position;
+            fieldEnemy.animator.SetBool("Run", true);
         }
 
         public override void Update_()
@@ -263,6 +268,7 @@ namespace EnemyState
         {
             Debug.Log("Exit Tracking");
             fieldEnemy.agent.destination = fieldEnemy.patrolPoint.position;
+            fieldEnemy.animator.SetBool("Run", false);
         }
     }
 }
