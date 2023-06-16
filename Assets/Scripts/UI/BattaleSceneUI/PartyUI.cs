@@ -11,7 +11,6 @@ public class PartyUI : BaseUI
 
     protected override void Awake()
     {
-        DataSetUp();
     }
 
     public void SetHpValue(int value)
@@ -46,13 +45,13 @@ public class PartyUI : BaseUI
 
 
             //Setting Slider HP, SP bar
-            partyElement.sliders["HPSlider"].GetComponent<HPbar>().unit = BattleManager.Instance.playerUnits[tempi];
-            partyElement.sliders["SPSlider"].GetComponent<SPbar>().unit = BattleManager.Instance.playerUnits[tempi];
+            partyElement.sliders["HPSlider"].GetComponent<HPbar>().unit = GameManager.Battle.playerUnits[tempi];
+            partyElement.sliders["SPSlider"].GetComponent<SPbar>().unit = GameManager.Battle.playerUnits[tempi];
 
             partyElement.sliders["HPSlider"].GetComponent<HPbar>().SetBar();
             partyElement.sliders["SPSlider"].GetComponent<SPbar>().SetBar();
 
-            partyElement.SetEvent(BattleManager.Instance.playerUnits[tempi].OnHpChanged, BattleManager.Instance.playerUnits[tempi].OnSpChanged);
+            partyElement.SetEvent(GameManager.Battle.playerUnits[tempi].OnHpChanged, GameManager.Battle.playerUnits[tempi].OnSpChanged);
 
             tempi++;
         }

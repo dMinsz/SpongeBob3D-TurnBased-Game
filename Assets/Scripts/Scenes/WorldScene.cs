@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TitleScene : BaseScene
+public class WorldScene : BaseScene
 {
     protected override void Awake()
     {
         base.Awake();
-        Debug.Log("TitleScene Init");
+        Debug.Log("World Scene Init");
     }
 
     protected override IEnumerator LoadingRoutine()
@@ -27,17 +27,13 @@ public class TitleScene : BaseScene
 
     private void OnDestroy()
     {
-        Debug.Log("TitleScene Release");
+        Debug.Log("World Release");
     }
 
-    public void OnStartButton()
-    {
-        GameManager.Scene.LoadScene("WolrdScene");
-    }
 
     public override void Clear()
     {
-        
+
     }
 
 }

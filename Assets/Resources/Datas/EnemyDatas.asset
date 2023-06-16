@@ -13,15 +13,9 @@ MonoBehaviour:
   m_Name: EnemyDatas
   m_EditorClassIdentifier: 
   enemys:
-  - enemyPrefab: {fileID: 2207862217511537021, guid: 7e635106e7a028f4a8fcb9336c8ba6b6, type: 3}
-    name: Enemy1
+  - enemyPrefab: {fileID: 632098661, guid: 5971e8c12a37b714bbf04163b42f8a13, type: 3}
+    name: RoboTT
     MaxHP: 10
     MaxSP: 10
     AttackDamage: 1
     SkillDamage: 2
-  - enemyPrefab: {fileID: 2207862217511537021, guid: 7e635106e7a028f4a8fcb9336c8ba6b6, type: 3}
-    name: Enemy2
-    MaxHP: 10
-    MaxSP: 10
-    AttackDamage: 2
-    SkillDamage: 3

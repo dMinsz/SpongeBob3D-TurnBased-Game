@@ -229,7 +229,7 @@ GameObject:
   - component: {fileID: 89744437}
   - component: {fileID: 89744436}
   m_Layer: 0
-  m_Name: CM vcam1
+  m_Name: vcam1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -444,7 +444,7 @@ GameObject:
   - component: {fileID: 544437670}
   - component: {fileID: 544437669}
   m_Layer: 0
-  m_Name: CM vcam4
+  m_Name: vcam4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -551,7 +551,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &678252764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -989,7 +989,7 @@ GameObject:
   - component: {fileID: 1124110761}
   - component: {fileID: 1124110760}
   m_Layer: 0
-  m_Name: CM vcam3
+  m_Name: vcam3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1093,6 +1093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00382c7c61ea8734b91f6a0a162d0761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  partyUI: {fileID: 0}
 --- !u!1 &1174625445
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,7 +1246,7 @@ GameObject:
   - component: {fileID: 1191848894}
   - component: {fileID: 1191848893}
   m_Layer: 0
-  m_Name: CM vcam2
+  m_Name: vcam2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -24,6 +24,10 @@ public class GameManager : MonoBehaviour
     private static UIManager uiManager;
     public static UIManager UI { get { return uiManager; } }
 
+    //BattleManager
+    private static BattleManager btManaser;
+    public static BattleManager Battle { get { return btManaser; } }
+
     private GameManager() { }
  
 
@@ -71,6 +75,11 @@ public class GameManager : MonoBehaviour
         sObj.name = "SceneManagerEX";
         sObj.transform.SetParent(transform);
         sceneManager = sObj.AddComponent<SceneManagerEX>();
+
+        GameObject bObj = new GameObject();
+        bObj.name = "BattleManager";
+        bObj.transform.SetParent(transform);
+        btManaser = bObj.AddComponent<BattleManager>();
 
     }
 }

@@ -19,53 +19,12 @@ public class BattleManager : MonoBehaviour
 {
     public bool isDebug = false;
 
-    #region Singleton
-    private static BattleManager instance;
-    public static BattleManager Instance
-    {
-        get
-        {
-            return instance;
-        }
-    }
-
-    private BattleManager() { }
-
-
-    private void Awake() // Editor Inspector prevent Add 
-    {
-        if (instance != null)
-        {
-            Debug.LogWarning("Battle Manager Instance: valid instance already registered.");
-            Destroy(this);
-            return;
-        }
-
-        //DontDestroyOnLoad(this);
-
-        instance = this;
-
-        //for Debug
-        if (isDebug == true)
-        {
-            Setup();
-        }
-
-    }
-    private void OnDestroy()
-    {
-
-        if (instance == this)
-            instance = null;
-    }
-    #endregion
-
     [SerializeField] private BattleState state = BattleState.START;
 
     public BattleState GetState() { return state; }
 
-    public Transform[] playerBattleStation;
-    public Transform[] enemyBattleStation;
+    public List<Transform> playerBattleStation;
+    public List<Transform> enemyBattleStation;
 
     [HideInInspector] public PlayableDatas playerDatas;
     [HideInInspector] public EnemyDatas enemyDatas;
@@ -73,7 +32,7 @@ public class BattleManager : MonoBehaviour
     [HideInInspector]  public List<Player> playerUnits;
     [HideInInspector] public List<Enemy> enemyUnits;
 
-    public CinemachineVirtualCamera[] Cams;
+    public List<CinemachineVirtualCamera> Cams;
 
     EnemyDatas.EnemyInfo encounteredUnit; 
 
@@ -101,7 +60,8 @@ public class BattleManager : MonoBehaviour
     Transform SkillUI;
     Transform EndUI;
     TMP_Text EndText;
-    private void Start()
+
+    public void SetingUI() 
     {
         //Menu hud Open
         GameObject canvas = GameObject.Find("BattleCanvas");
@@ -114,7 +74,6 @@ public class BattleManager : MonoBehaviour
 
         MenuUI.gameObject.SetActive(true);
     }
-
 
     public void SettingBattle(BattleState _state, int _waveMaxCount , int _EachEnemyCount , int MaxEnemytype)
     {
@@ -252,6 +211,8 @@ public class BattleManager : MonoBehaviour
 
             temp.transform.LookAt(nowPlayer.transform.position);
 
+            temp.GetComponent<FieldEnemy>().enabled = false;
+
             enemyUnits.Add(temp);
         }
 
@@ -261,6 +222,41 @@ public class BattleManager : MonoBehaviour
 
         FreeTarget(enemyUnits[0]);
     }
+    private void Awake()
+    {
+        
+    }
+
+    public void Init()
+    {
+
+        playerBattleStation = new List<Transform>();
+
+
+        var rootPlayerStations = GameObject.Find("PlayerStations");
+        playerBattleStation.Add(rootPlayerStations.transform.Find("Player1"));
+        playerBattleStation.Add(rootPlayerStations.transform.Find("Player2"));
+        playerBattleStation.Add(rootPlayerStations.transform.Find("Player3"));
+        playerBattleStation.Add(rootPlayerStations.transform.Find("Player4"));
+
+        enemyBattleStation = new List<Transform>();
+
+        var rootEnemyStations = GameObject.Find("EnemyStations");
+        enemyBattleStation.Add(rootEnemyStations.transform.Find("Enemy1"));
+        enemyBattleStation.Add(rootEnemyStations.transform.Find("Enemy2"));
+        enemyBattleStation.Add(rootEnemyStations.transform.Find("Enemy3"));
+
+        Cams = new List<CinemachineVirtualCamera>();
+
+        Cams.Add(GameObject.Find("vcam1").transform.GetComponent<CinemachineVirtualCamera>());
+        Cams.Add(GameObject.Find("vcam2").transform.GetComponent<CinemachineVirtualCamera>());
+        Cams.Add(GameObject.Find("vcam3").transform.GetComponent<CinemachineVirtualCamera>());
+        Cams.Add(GameObject.Find("vcam4").transform.GetComponent<CinemachineVirtualCamera>());
+
+
+
+    }
+
     public void Setup()
     {
         //isSetUp = true;
@@ -564,11 +560,15 @@ public class BattleManager : MonoBehaviour
         {
             EndUI.gameObject.SetActive(true);
             EndText.text = "You Win";
+
+            GameManager.Scene.LoadScene("WolrdScene");
         }
         else if (state == BattleState.LOST)
         {
             EndUI.gameObject.SetActive(true);
             EndText.text = "You Lost";
+
+            GameManager.Scene.LoadScene("WolrdScene");
         }
     }
 }

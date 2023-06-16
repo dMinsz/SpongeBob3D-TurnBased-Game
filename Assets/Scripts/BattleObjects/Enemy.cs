@@ -17,7 +17,8 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
     // Start is called before the first frame update
     void Start()
     {
-        targeting.gameObject.SetActive(false);
+        if (targeting != null) 
+            targeting.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -64,26 +65,26 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
         if (!isTargeted)
         { // 타겟팅이안되어있으면
 
-            if (BattleManager.Instance.GetTargetedEnemy() == null)
+            if (GameManager.Battle.GetTargetedEnemy() == null)
             {//배틀 매니저에 타겟팅 확인
                 isTargeted = true;
 
                 targeting.gameObject.SetActive(true);
                 targeting.color = AdjustAlpha(255); // 알파값변경
 
-                BattleManager.Instance.SetTaget(this);
+                GameManager.Battle.SetTaget(this);
             }
             else //타겟팅이되어있으면
             {
                 //원래타겟팅됬던거 풀어준다.
-                BattleManager.Instance.GetTargetedEnemy().targeting.gameObject.SetActive(false);
-                BattleManager.Instance.GetTargetedEnemy().isTargeted = false;
+                GameManager.Battle.GetTargetedEnemy().targeting.gameObject.SetActive(false);
+                GameManager.Battle.GetTargetedEnemy().isTargeted = false;
 
                 //원래 지정됬던 타겟 알파값조정
-                Color tempTargetColor = BattleManager.Instance.GetTargetedEnemy().targeting.color;
+                Color tempTargetColor = GameManager.Battle.GetTargetedEnemy().targeting.color;
                 tempTargetColor.a = 140;
 
-                BattleManager.Instance.GetTargetedEnemy().targeting.color = tempTargetColor;
+                GameManager.Battle.GetTargetedEnemy().targeting.color = tempTargetColor;
 
                 //현재 타겟 알파값조정
                 targeting.gameObject.SetActive(true);
@@ -93,7 +94,7 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
                 
                 targeting.gameObject.SetActive(true);
 
-                BattleManager.Instance.SetTaget(this);
+                GameManager.Battle.SetTaget(this);
 
             }
 

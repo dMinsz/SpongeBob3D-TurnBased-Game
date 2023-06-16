@@ -6,7 +6,7 @@ public class SelectMenuUI : BaseUI
 {
     private void Update()
     {
-        if (BattleManager.Instance.GetState() != BattleState.PLAYERTURN)
+        if (GameManager.Battle.GetState() != BattleState.PLAYERTURN)
         {
             this.gameObject.SetActive(false);
         }
