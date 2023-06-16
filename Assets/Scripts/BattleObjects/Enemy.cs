@@ -23,7 +23,10 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
     // Update is called once per frame
     void Update()
     {
-
+        if (IsDie())
+        {
+            Die();
+        }
     }
     #region BattleScean Point Funcs
     public void OnPointerEnter(PointerEventData eventData)
@@ -124,10 +127,9 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
         }
     }
 
-    public override bool IsDie()
+    public void Die()
     {
         //죽을때 행동 추가
-        
-        return base.IsDie();
+        Destroy(this.gameObject);
     }
 }

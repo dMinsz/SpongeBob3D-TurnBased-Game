@@ -42,11 +42,12 @@ public class BattleManager : MonoBehaviour
 
         instance = this;
 
-        //Debug��
+        //for Debug
         if (isDebug == true)
         {
             Setup();
         }
+
     }
     private void OnDestroy()
     {
@@ -74,6 +75,8 @@ public class BattleManager : MonoBehaviour
     Enemy targetEnemy;
     public Player targetPlayer;
 
+    public Player nowPlayer;
+
     //Monster Wave
     private const int MAXWAVE = 3;
     private int waveCount = 2;
@@ -85,9 +88,19 @@ public class BattleManager : MonoBehaviour
     //public WaveDatas waveData; 
     public List<Wave> _wave;
 
-
-
     Coroutine TurnRoutine;
+
+    Transform MenuUI;
+
+    private void Start()
+    {
+        //Menu hud Open
+        GameObject canvas = GameObject.Find("BattleCanvas");
+        var BattleUI = canvas.transform.Find("BattleUI");
+        MenuUI = BattleUI.transform.Find("SelectMenuUI");
+        MenuUI.gameObject.SetActive(true);
+    }
+
 
     public void SettingBattle(BattleState _state, EnemyDatas.EnemyInfo _encounteredUnit, int _waveCount)
     {
@@ -178,7 +191,7 @@ public class BattleManager : MonoBehaviour
             //int EachWaveEnemyCount = Random.Range(1, maxEachEnemyCount+1);
             //test
             int EachWaveEnemyCount = 3;
-            int index = Random.Range(0, maxEnemyTypeNum + 1); //maxEnemyNum �� ���Ծ��� �ʰ���
+            int index = Random.Range(0, maxEnemyTypeNum + 1); //maxEnemyNum
 
             Wave temp = new Wave();
             temp.EnemyList = new List<EnemyDatas.EnemyInfo>();
@@ -243,7 +256,7 @@ public class BattleManager : MonoBehaviour
             playerUnits.Add(temp);
         }
 
-       
+        nowPlayer = playerUnits[0];
         SetTaget(playerUnits[0]);
 
         //Enemy Position and Data Setting
@@ -260,7 +273,7 @@ public class BattleManager : MonoBehaviour
             temp.AttackDamage = _wave[0].EnemyList[i].AttackDamage;
             temp.SkillDamage = _wave[0].EnemyList[i].SkillDamage;
 
-            temp.transform.LookAt(targetPlayer.transform.position);
+            temp.transform.LookAt(nowPlayer.transform.position);
 
             enemyUnits.Add(temp);
         }
@@ -281,7 +294,39 @@ public class BattleManager : MonoBehaviour
 
     public void OnPlayerAttack()
     {
+       
+        Debug.Log("Player Attack start");
+        TurnRoutine = StartCoroutine(PlayerMoveAndAttack());
+        MenuUI.gameObject.SetActive(false);
+ 
+    }
 
+    bool isPlayerAttackDone = false;
+    IEnumerator PlayerMoveAndAttack() 
+    {
+        while (true)
+        {
+            Vector3 tempPos = nowPlayer.transform.position;
+
+            if (targetEnemy == null)
+            {
+                Debug.Log("You Need Set Target");
+                yield return null;
+            }
+
+            UnitMove(targetEnemy.transform.position, nowPlayer.transform);
+            yield return new WaitForSeconds(0.2f);
+            nowPlayer.Attack(nowPlayer.AttackDamage, targetEnemy);
+
+            UnitMove(tempPos, nowPlayer.transform);
+            yield return new WaitForSeconds(0.2f);
+
+            isPlayerAttackDone = true;
+            MenuUI.gameObject.SetActive(true);
+            Debug.Log("Player Attack Done");
+            break;
+        }
+       
     }
 
     public void PlayerTurn()
@@ -296,25 +341,26 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    bool IsEnemyMovedone = false;
+    bool IsMovedone = false;
 
-    void EnemyMove(Vector3 target, Transform enemy)
+    void UnitMove(Vector3 target, Transform moveUnit)
     {
         while (true)
         {
-            enemy.LookAt(target);
-            Vector3 dir = (target - enemy.position).normalized;
+            moveUnit.LookAt(target);
+            Vector3 dir = (target - moveUnit.position).normalized;
             float speed = 1f;
             var attackRange = 2;
-            enemy.position += dir * speed * Time.deltaTime;
-            var distance = Vector3.Distance(target, enemy.position);
+            //moveUnit.position += dir * speed * Time.deltaTime;
+            moveUnit.transform.Translate(dir * speed * Time.deltaTime, Space.World);
+            var distance = Vector3.Distance(target, moveUnit.position);
 
 
             if (attackRange > distance)
             {
                 if (distance <= 0.1f)
                 {
-                    IsEnemyMovedone = true;
+                    IsMovedone = true;
                     break;
                 }
             }
@@ -328,7 +374,7 @@ public class BattleManager : MonoBehaviour
         Player temp = new Player();
         int hp = int.MaxValue;
 
-        //hp 가장낮은거 찾아내기
+        //Find hp Lower Player
         foreach (var player in playerUnits)
         {
             if (player.curHP < hp)
@@ -343,20 +389,22 @@ public class BattleManager : MonoBehaviour
         {
             Vector3 tempPos = enemy.transform.position;
 
-            EnemyMove(temp.transform.position, enemy.transform);// 캐릭터에게 공격무브
+            UnitMove(temp.transform.position, enemy.transform);// Move To Player
 
-            if (IsEnemyMovedone == true)
-                IsEnemyMovedone = false;
+            if (IsMovedone == true)
+                IsMovedone = false;
             else
                 continue;
 
             enemy.Attack(enemy.AttackDamage, temp);
             
             yield return new WaitForSeconds(0.2f);
-            EnemyMove(tempPos, enemy.transform);//다시돌아가기 
+            UnitMove(tempPos, enemy.transform);//Move Back Origin Pos
 
-            if (IsEnemyMovedone == true)
-                IsEnemyMovedone = false;
+            enemy.transform.LookAt(temp.transform.position); // Re Look up Player
+
+            if (IsMovedone == true)
+                IsMovedone = false;
             else
                 continue;
 

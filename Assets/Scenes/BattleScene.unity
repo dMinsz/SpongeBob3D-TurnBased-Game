@@ -245,7 +245,9 @@ MonoBehaviour:
   - {fileID: 1688445899}
   playerDatas: {fileID: 0}
   enemyDatas: {fileID: 0}
+  playerUnits: []
   targetPlayer: {fileID: 0}
+  nowPlayer: {fileID: 0}
   curentWave: 0
 --- !u!4 &678252765
 Transform:
@@ -2549,7 +2551,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 678252764}
+        m_TargetAssemblyTypeName: BattleManager, Assembly-CSharp
+        m_MethodName: OnPlayerAttack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!224 &1719768727827252899
 RectTransform:
   m_ObjectHideFlags: 0
