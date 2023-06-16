@@ -8,6 +8,7 @@ public class PlayerMover : MonoBehaviour
     [SerializeField] bool debug;
 
     [SerializeField] float moveSpeed;
+    private float curSpeed;
 
     private CharacterController characterController;
     private Animator animator;
@@ -27,21 +28,26 @@ public class PlayerMover : MonoBehaviour
     private void Move()
     {
         if (moveDir.magnitude == 0)
+        {
+            curSpeed = 0;
+            animator.SetFloat("MoveSpeed", curSpeed);
             return;
+        }
 
         Vector3 forwardVec = new Vector3(Camera.main.transform.forward.x, 0, Camera.main.transform.forward.z).normalized;
         Vector3 rightVec = new Vector3(Camera.main.transform.right.x, 0, Camera.main.transform.right.z).normalized;
 
-        characterController.Move(forwardVec * moveDir.z * moveSpeed * Time.deltaTime);
-        characterController.Move(rightVec * moveDir.x * moveSpeed * Time.deltaTime);
-        // animator.SetFloat("MoveSpeed", curSpeed);
+        curSpeed = Mathf.Lerp(curSpeed, moveSpeed, 0.25f);
+
+        characterController.Move(forwardVec * moveDir.z * curSpeed * Time.deltaTime);
+        characterController.Move(rightVec * moveDir.x * curSpeed * Time.deltaTime);
+        animator.SetFloat("MoveSpeed", curSpeed);
 
         Quaternion lookRotation = Quaternion.LookRotation(forwardVec * moveDir.z + rightVec * moveDir.x);
         // Debug.Log(forwardVec);
         // Debug.Log(rightVec);
         // Debug.Log(lookRotation);
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 0.05f);
-
     }
 
     private void OnMove(InputValue value)
