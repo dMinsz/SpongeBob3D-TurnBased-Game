@@ -328,10 +328,6 @@ PrefabInstance:
       propertyPath: unit
       value: 
       objectReference: {fileID: 2207862217511537021}
-    - target: {fileID: 4733110650252886426, guid: 27079c94e8eb89b4ba6c3fbd1908ffc1, type: 3}
-      propertyPath: enemy
-      value: 
-      objectReference: {fileID: 2207862217511537021}
     - target: {fileID: 5893972874820583175, guid: 27079c94e8eb89b4ba6c3fbd1908ffc1, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

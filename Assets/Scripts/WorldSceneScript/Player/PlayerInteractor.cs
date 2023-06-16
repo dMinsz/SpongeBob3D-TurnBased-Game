@@ -12,6 +12,10 @@ public class PlayerInteractor : MonoBehaviour
 
     private Animator animator;
 
+    private void Update()
+    {
+        
+    }
     private void Awake()
     {
         animator = GetComponent<Animator>();

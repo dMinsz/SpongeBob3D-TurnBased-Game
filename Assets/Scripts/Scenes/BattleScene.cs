@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BattleScene : BaseScene
 {
@@ -16,44 +17,58 @@ public class BattleScene : BaseScene
         //BattleManager.Instance.Setup();
     }
 
+    bool Isdone = false;
+
     protected override IEnumerator LoadingRoutine()
     {
-        // fake loading
-        Debug.Log("Battle Scene Road Somethings");
-        GameManager.Battle.Init();
-        progress = 0.2f;
-        yield return new WaitForSecondsRealtime(0.2f);
-        GameManager.Battle.Setup();
-        progress = 0.4f;
-        yield return new WaitForSecondsRealtime(0.2f);
-        GameManager.Battle.SetingUI();
-        progress = 0.6f;
-        yield return new WaitForSecondsRealtime(0.2f);
-
-        var cavans = GameObject.Find("BattleCanvas");
-        var BattleUI = cavans.transform.Find("BattleUI");
-        var _partyUI = BattleUI.transform.Find("PartyUI");
-        partyUI = _partyUI;
-
-        partyUI.GetComponent<PartyUI>().DataSetUp();
-        progress = 0.8f;
-        yield return new WaitForSecondsRealtime(0.2f);
-
-        var players=GameObject.FindGameObjectsWithTag("Player");
-
-        foreach (var p in players)
+        if (!Isdone)
         {
-            p.GetComponent<PlayerMover>().enabled = false;
+            // fake loading
+            Debug.Log("Battle Scene Road Somethings");
+            GameManager.Battle.Init();
+            progress = 0.2f;
+            //yield return new WaitForSecondsRealtime(0.2f);
+            GameManager.Battle.SetingUI();
+            progress = 0.4f;
+            //yield return new WaitForSecondsRealtime(0.2f);
+            GameManager.Battle.Setup();
+            progress = 0.6f;
+            //yield return new WaitForSecondsRealtime(0.2f);
+
+            var cavans = GameObject.Find("BattleCanvas");
+            var BattleUI = cavans.transform.Find("BattleUI");
+            var _partyUI = BattleUI.transform.Find("PartyUI");
+            partyUI = _partyUI;
+
+            partyUI.GetComponent<PartyUI>().DataSetUp();
+            progress = 0.8f;
+            //yield return new WaitForSecondsRealtime(0.2f);
+
+            var players = GameObject.FindGameObjectsWithTag("Player");
+
+            foreach (var p in players)
+            {
+                p.GetComponent<PlayerMover>().enabled = false;
+                p.GetComponent<PlayerInteractor>().enabled = false;
+                p.GetComponent<PlayerInput>().enabled = false;
+            }
+
+            var Enemys = GameObject.FindGameObjectsWithTag("Enemy");
+
+            foreach (var e in Enemys)
+            {
+                e.GetComponent<FieldEnemy>().enabled = false;
+
+                e.transform.Find("Canvas").gameObject.SetActive(true);
+            }
+
+            progress = 1.0f;
+            Isdone = true;
+
+
         }
-
-        var Enemys = GameObject.FindGameObjectsWithTag("Enemy");
-
-        foreach (var e in Enemys)
-        {
-            e.GetComponent<FieldEnemy>().enabled = false;
-        }
-
-        progress = 1.0f;
+      
+        yield break;
     }
 
     private void OnDestroy()
@@ -64,7 +79,21 @@ public class BattleScene : BaseScene
 
     public override void Clear()
     {
-        
+        //var players = GameObject.FindGameObjectsWithTag("Player");
+
+        //foreach (var p in players)
+        //{
+        //    p.GetComponent<PlayerMover>().enabled = true;
+        //    p.GetComponent<PlayerInteractor>().enabled = true;
+        //}
+
+        //var Enemys = GameObject.FindGameObjectsWithTag("Enemy");
+
+        //foreach (var e in Enemys)
+        //{
+        //    e.GetComponent<FieldEnemy>().enabled = true;
+        //    e.transform.Find("Canvas").gameObject.SetActive(false);
+        //}
     }
 
 }

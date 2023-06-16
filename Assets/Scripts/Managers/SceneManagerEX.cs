@@ -87,12 +87,12 @@ public class SceneManagerEX : MonoBehaviour
         }
       
         //oper.allowSceneActivation = true;
-        Time.timeScale = 1f;
-
         loadingUI.SetProgress(1f);
         loadingUI.FadeIn();
 
+
         yield return new WaitForSecondsRealtime(0.5f); // wait Fade In
+        Time.timeScale = 1f;
     }
 
     public void Clear()

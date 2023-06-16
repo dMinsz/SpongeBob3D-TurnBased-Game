@@ -6,12 +6,16 @@ using UnityEngine.UI;
 
 public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public Animator animator;
     Image targeting;
     bool isTargeted = false;
 
     private void Awake()
     {
-        targeting = GetComponentInChildren<Image>();
+        
+        var canvas = transform.Find("Canvas");
+        targeting = canvas.Find("Targeting").GetComponent<Image>();
+        animator = GetComponent<Animator>();
     }
 
     // Start is called before the first frame update
@@ -32,7 +36,7 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
     #region BattleScean Point Funcs
     public void OnPointerEnter(PointerEventData eventData)
     {
-    
+        transform.Find("Canvas").gameObject.SetActive(true);
         targeting.gameObject.SetActive(true);
 
         if (isTargeted) 
@@ -109,16 +113,19 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
     
     public override void Attack(int damage, Unit target)
     {
+       
         target.TakeDamage(damage);
     }
 
     public override void DoSkill(int damage, Unit target)
     {
+     
         target.TakeDamage(damage);
     }
 
     public override void TakeDamage(int damage)
     {
+
         base.HP -= damage;
 
         if (base.HP <= 0)

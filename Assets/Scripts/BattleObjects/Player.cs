@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class Player : Unit
 {
-
-    void Start()
+    public Animator animator;
+    private void Awake()
     {
-        
+        animator = GetComponent<Animator>();
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -18,11 +17,13 @@ public class Player : Unit
 
     public override void Attack(int damage, Unit target)
     {
+        
         target.TakeDamage(damage);
     }
 
     public override void DoSkill(int damage, Unit target)
     {
+        
         target.TakeDamage(damage);
     }
 

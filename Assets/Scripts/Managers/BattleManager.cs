@@ -37,6 +37,7 @@ public class BattleManager : MonoBehaviour
     EnemyDatas.EnemyInfo encounteredUnit; 
 
     Enemy targetEnemy;
+
     [HideInInspector] public Player targetPlayer;
 
     [HideInInspector] public Player nowPlayer;
@@ -72,7 +73,7 @@ public class BattleManager : MonoBehaviour
         EndUI = canvas.transform.Find("EndBackGround");
         EndText = EndUI.GetComponentInChildren<TMP_Text>();
 
-        MenuUI.gameObject.SetActive(true);
+        //MenuUI.gameObject.SetActive(true);
     }
 
     public void SettingBattle(BattleState _state, int _waveMaxCount , int _EachEnemyCount , int MaxEnemytype)
@@ -293,9 +294,13 @@ public class BattleManager : MonoBehaviour
         MakeWave(MaxTypeNum, MaxEachEnemyCount);
 
 
-        if (state == BattleState.START)
+        if (state == BattleState.ENEMYTURN)
         {
             TurnRoutine = StartCoroutine(EnemyTurnRoutine());
+        }
+        else if (state == BattleState.PLAYERTURN)
+        {
+           PlayerTurn();
         }
     }
 
@@ -372,21 +377,22 @@ public class BattleManager : MonoBehaviour
     //bool isPlayerAttackDone = false;
     IEnumerator PlayerMoveAndAttack() 
     {
-        yield return new WaitForSeconds(0.5f);
         SkillUI.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
 
         while (true)
         {
             Vector3 tempPos = nowPlayer.transform.position;
-
+            Vector3 tempEnemyPos = targetEnemy.transform.position;
             if (targetEnemy == null)
             {
                 Debug.Log("You Need Set Target");
                 yield return null;
             }
 
+            nowPlayer.animator.SetTrigger("Attack");
             UnitMove(targetEnemy.transform.position, nowPlayer.transform);
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(1f);
 
             //enemy hp check and Remove
             var hp = targetEnemy.HP - nowPlayer.AttackDamage;
@@ -406,6 +412,7 @@ public class BattleManager : MonoBehaviour
             //MenuUI.gameObject.SetActive(true);
             Debug.Log("Player Attack Done");
 
+            nowPlayer.transform.LookAt(tempEnemyPos);
 
             if (enemyUnits.Count <= 0)
             {
@@ -442,7 +449,8 @@ public class BattleManager : MonoBehaviour
 
     public void PlayerTurn()
     {
-        StopCoroutine(TurnRoutine);
+        if(TurnRoutine != null)
+            StopCoroutine(TurnRoutine);
 
         //Menu hud Open
         MenuUI.gameObject.SetActive(true);
@@ -475,7 +483,7 @@ public class BattleManager : MonoBehaviour
 
             if (attackRange > distance)
             {
-                if (distance <= 0.1f)
+                if (distance <= 1f)
                 {
                     IsMovedone = true;
                     break;
@@ -493,7 +501,7 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator EnemyTurnRoutine()
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(1f);
 
         Player temp = new Player();
         int hp = int.MaxValue;
@@ -513,8 +521,10 @@ public class BattleManager : MonoBehaviour
         {
             Vector3 tempPos = enemy.transform.position;
 
-            UnitMove(temp.transform.position, enemy.transform);// Move To Player
+            enemy.animator.SetTrigger("Attack");
 
+            UnitMove(temp.transform.position, enemy.transform);// Move To Player
+            yield return new WaitForSeconds(0.2f);
             if (IsMovedone == true)
                 IsMovedone = false;
             else
@@ -561,14 +571,28 @@ public class BattleManager : MonoBehaviour
             EndUI.gameObject.SetActive(true);
             EndText.text = "You Win";
 
-            GameManager.Scene.LoadScene("WolrdScene");
+            //GameManager.Scene.LoadScene("WolrdScene");
         }
         else if (state == BattleState.LOST)
         {
             EndUI.gameObject.SetActive(true);
             EndText.text = "You Lost";
 
-            GameManager.Scene.LoadScene("WolrdScene");
+            //GameManager.Scene.LoadScene("WolrdScene");
         }
+
+        EndUI.transform.Find("Button").GetComponent<Button>().onClick.AddListener(EndBattleSystem);
+
+    }
+
+    public void EndBattleSystem() 
+    {
+        playerUnits =null;
+        enemyUnits = null;
+        targetPlayer = null;
+        nowPlayer = null;
+
+        GameManager.Scene.LoadScene("WolrdScene");
+
     }
 }
