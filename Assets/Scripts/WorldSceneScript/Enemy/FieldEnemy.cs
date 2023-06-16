@@ -89,7 +89,7 @@ public class FieldEnemy : MonoBehaviour
     private void Update()
     {
         FindPlayer();
-        states[(int)curState].Update();
+        states[(int)curState].Update_();
     }
 
     public void ChangeState(StateEnemy state)
@@ -97,7 +97,7 @@ public class FieldEnemy : MonoBehaviour
         states[(int)curState].Exit();
         curState = state;
         states[(int)curState].Enter();
-        states[(int)curState].Update();
+        states[(int)curState].Update_();
     }
 }
 
@@ -122,7 +122,7 @@ namespace EnemyState
             idleTime = 0;
         }
 
-        public override void Update()
+        public override void Update_()
         {
             idleTime += Time.deltaTime;
 
@@ -163,7 +163,7 @@ namespace EnemyState
             fieldEnemy.agent.destination = curPoint.position;
         }
 
-        public override void Update()
+        public override void Update_()
         {
             if (Vector3.Distance(fieldEnemy.transform.position, curPoint.position) < 0.5f)
             {
@@ -184,7 +184,11 @@ namespace EnemyState
     {
         private FieldEnemy fieldEnemy;
 
-        private GameObject player;
+        [SerializeField] bool debug;
+        [SerializeField] float range;
+        [SerializeField, Range(0, 360)] float angle;
+
+        private GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         public TrackingState(FieldEnemy fieldEnemy)
         {
@@ -206,16 +210,54 @@ namespace EnemyState
             }
         }
 
+        public void AttackTaiming()
+        {
+            // 1. 범위 안에 있는지
+            Collider[] colliders = Physics.OverlapSphere(transform.position, range);
+            foreach (Collider collider in colliders)
+            {
+                if(collider.tag != player.tag)
+                    continue;
+
+                // 2. 앞에 있는지, 대상 방향까지의 cos를 계산하여 내적이 +이면 어택
+                Vector3 dirTarget = (collider.transform.position - transform.position).normalized;
+                if (Vector3.Dot(transform.forward, dirTarget) < Mathf.Cos(angle * 0.5f * Mathf.Deg2Rad)) // Dot은 내적
+                    continue;                                                              // 호도법
+
+                IHittable hittable = collider.GetComponent<IHittable>();
+                hittable?.TakeHit();
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!debug)
+                return;
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, range);
+
+            Vector3 rightDir = AngleToDir(transform.eulerAngles.y + angle * 0.5f);
+            Vector3 leftDir = AngleToDir(transform.eulerAngles.y - angle * 0.5f);
+            Debug.DrawRay(transform.position, rightDir * range, Color.red);
+            Debug.DrawRay(transform.position, leftDir * range, Color.red);
+        }
+
+        private Vector3 AngleToDir(float angle)
+        {
+            float radian = angle * Mathf.Deg2Rad;
+            return new Vector3(Mathf.Sin(radian), 0, Mathf.Cos(radian));
+        }
+
         public override void Enter()
         {
             Debug.Log("Enter Tracking");
             fieldEnemy.agent.destination = fieldEnemy.transform.position;
-            player = GameObject.FindGameObjectWithTag("Player");
 
-            StartCoroutine(TrackingRoutine);
+            StartCoroutine(TrackingRoutine());
         }
 
-        public override void Update()
+        public override void Update_()
         {
             if (!fieldEnemy.foundPlayer)
                 fieldEnemy.ChangeState(StateEnemy.Idle);
@@ -224,6 +266,7 @@ namespace EnemyState
         public override void Exit()
         {
             Debug.Log("Exit Tracking");
+            StopAllCoroutines();
         }
     }
 }
