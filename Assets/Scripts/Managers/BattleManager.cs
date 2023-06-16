@@ -5,7 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
+
 
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WAVE, WON, LOST }
