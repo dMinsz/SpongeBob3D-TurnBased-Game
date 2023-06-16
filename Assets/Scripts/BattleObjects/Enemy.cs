@@ -120,7 +120,7 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
     {
         base.HP -= damage;
 
-        if (base.HP < 0)
+        if (base.HP <= 0)
         {
             base.HP = 0;
             base.isDied = true;

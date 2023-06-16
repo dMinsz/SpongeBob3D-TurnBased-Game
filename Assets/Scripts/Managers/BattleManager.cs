@@ -159,7 +159,7 @@ public class BattleManager : MonoBehaviour
     {
         foreach (var enemy in enemyUnits)
         {
-            enemy.transform.LookAt(targetPlayer.transform.position);
+            enemy.transform.LookAt(nowPlayer.transform.position);
         }
     }
 
@@ -291,6 +291,32 @@ public class BattleManager : MonoBehaviour
     }
 
 
+    public Player NextPlayer() 
+    {
+        int index = playerUnits.FindIndex(x => nowPlayer);
+        if (index < playerUnits.Count - 1)
+        {
+            return playerUnits[index + 1];
+        }
+        else 
+        {
+            return null;
+        }
+    }
+
+    public Player FirstPlayer() 
+    {
+        foreach (Player player in playerUnits) 
+        {
+            if (player.IsDie() == false)
+            {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
 
     public void OnPlayerAttack()
     {
@@ -316,14 +342,52 @@ public class BattleManager : MonoBehaviour
 
             UnitMove(targetEnemy.transform.position, nowPlayer.transform);
             yield return new WaitForSeconds(0.2f);
+
+            //enemy hp check and Remove
+            var hp = targetEnemy.HP - nowPlayer.AttackDamage;
+
+            if (hp <= 0)
+            {
+                enemyUnits.Remove(targetEnemy);
+            }
+
             nowPlayer.Attack(nowPlayer.AttackDamage, targetEnemy);
 
+            //Comback to origin pos
             UnitMove(tempPos, nowPlayer.transform);
             yield return new WaitForSeconds(0.2f);
 
             isPlayerAttackDone = true;
-            MenuUI.gameObject.SetActive(true);
+            //MenuUI.gameObject.SetActive(true);
             Debug.Log("Player Attack Done");
+
+
+            if (enemyUnits.Count <= 0)
+            {
+                if (curentWave <= waveCount)
+                {
+                    //wave Make
+                }
+                else 
+                {
+                    state = BattleState.WON;
+                    EndBattle();
+                }
+            }
+
+            //next Player
+            Player next = NextPlayer();
+            if (next != null)
+            {
+                nowPlayer = next;
+                PlayerTurn();
+            }
+            else 
+            {
+                MenuUI.gameObject.SetActive(false);
+                TurnRoutine = StartCoroutine(EnemyTurn());
+            }
+
             break;
         }
        
@@ -334,10 +398,12 @@ public class BattleManager : MonoBehaviour
         StopCoroutine(TurnRoutine);
 
         //Menu hud Open
-        GameObject canvas = GameObject.Find("BattleCanvas");
-        var BattleUI = canvas.transform.Find("BattleUI");
-        var MenuUI = BattleUI.transform.Find("SelectMenuUI");
         MenuUI.gameObject.SetActive(true);
+
+        //Enemy Look Change
+        SetEnemysRotation();
+
+        //Player Cameara Setting
 
     }
 
@@ -369,6 +435,7 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator EnemyTurn()
     {
+        //MenuUI.gameObject.SetActive(false);
         yield return new WaitForSeconds(0.2f);
 
         Player temp = new Player();
@@ -413,13 +480,25 @@ public class BattleManager : MonoBehaviour
 
         state = BattleState.PLAYERTURN;
 
-        PlayerTurn();
+        Player next = FirstPlayer();
+        
+        if (next != null) 
+        { 
+            nowPlayer = next;
+            PlayerTurn();
+        }
+        else 
+        {
+            state = BattleState.LOST;
+            EndBattle(); 
+        }
 
         yield return null;
     }
 
     public void EndBattle()
     {
+        Debug.Log("Battle Done");
         if (state == BattleState.WON)
         {
 

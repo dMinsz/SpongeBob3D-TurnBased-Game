@@ -30,7 +30,7 @@ public class Player : Unit
     {
         base.HP -= damage;
 
-        if (base.HP < 0)
+        if (base.HP <= 0)
         {
             base.HP = 0;
             base.isDied = true;
