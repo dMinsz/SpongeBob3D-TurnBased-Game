@@ -48,6 +48,9 @@ public class PlayerInteractor : MonoBehaviour
 
         foreach (Collider collider in colliders)
         {
+            if (collider.tag != "Enemy")
+                continue;
+
             IHittable hittable = collider.GetComponent<IHittable>();
             hittable?.TakeHit();
         }

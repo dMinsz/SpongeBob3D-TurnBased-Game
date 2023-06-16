@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using EnemyState;
 using UnityEngine.AI;
 using System;
@@ -11,6 +10,7 @@ public class FieldEnemy : MonoBehaviour
     [SerializeField] public Transform patrolPoint;
     [SerializeField] public Transform enemySpawnPoint;
     [SerializeField] public float trackingSpeed;
+    [SerializeField] public Transform IPoint;
 
     [Header("StateMachine")]
     [NonSerialized] public NavMeshAgent agent;
@@ -35,20 +35,21 @@ public class FieldEnemy : MonoBehaviour
             Vector3 dirTarget = (collider.transform.position - transform.position).normalized;
             if (Vector3.Dot(transform.forward, dirTarget) < Mathf.Cos(angle * 0.5f * Mathf.Deg2Rad)) // Dot은 내적
             {                                                                             // 호도법      
-                foundPlayer = false;
                 continue;
             }
             // 3. 중간에 장애물이 없는지
             float distToTarget = Vector3.Distance(transform.position, collider.transform.position);
             if (Physics.Raycast(transform.position, dirTarget, distToTarget, obstacleMask))
             {
-                foundPlayer = false;
                 continue;
             }
 
             foundPlayer = true;
+            Debug.Log(foundPlayer);
             Debug.DrawRay(transform.position, dirTarget * distToTarget, Color.red);
+            return;
         }
+        foundPlayer = false;
     }
 
     private void OnDrawGizmosSelected()
@@ -184,9 +185,8 @@ namespace EnemyState
     {
         private FieldEnemy fieldEnemy;
 
-        [SerializeField] bool debug;
-        [SerializeField] float range;
-        [SerializeField, Range(0, 360)] float angle;
+        private float range = 1.5f;
+        private float angle;
 
         private GameObject player = GameObject.FindGameObjectWithTag("Player");
 
@@ -195,78 +195,74 @@ namespace EnemyState
             this.fieldEnemy = fieldEnemy;
         }
 
-        IEnumerator TrackingRoutine()
+        private void Tracking()
         {
-            while (true)
+            if (fieldEnemy.foundPlayer)
             {
                 fieldEnemy.transform.LookAt(player.transform);
                 fieldEnemy.transform.Translate(Vector3.forward * fieldEnemy.trackingSpeed * Time.deltaTime, Space.Self);
 
-                if (Vector3.Distance(player.transform.position, fieldEnemy.transform.position) < 1f)
+                if (Vector3.Distance(player.transform.position, fieldEnemy.transform.position) < 2f)
                 {
                     fieldEnemy.animator.SetTrigger("Attack");
+
+                    AttackTaiming();
                 }
-                yield return null;
             }
         }
 
         public void AttackTaiming()
         {
+            Debug.Log("Tracking Attack");
             // 1. 범위 안에 있는지
-            Collider[] colliders = Physics.OverlapSphere(transform.position, range);
+            Collider[] colliders = Physics.OverlapSphere(fieldEnemy.IPoint.transform.position, range);
             foreach (Collider collider in colliders)
             {
                 if(collider.tag != player.tag)
                     continue;
 
-                // 2. 앞에 있는지, 대상 방향까지의 cos를 계산하여 내적이 +이면 어택
-                Vector3 dirTarget = (collider.transform.position - transform.position).normalized;
-                if (Vector3.Dot(transform.forward, dirTarget) < Mathf.Cos(angle * 0.5f * Mathf.Deg2Rad)) // Dot은 내적
-                    continue;                                                              // 호도법
-
+                Debug.Log("FieldEnemy에서 플레이어 어택 발동");
                 IHittable hittable = collider.GetComponent<IHittable>();
                 hittable?.TakeHit();
             }
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            if (!debug)
-                return;
+        //private void OnDrawGizmosSelected()
+        //{
+        //    Gizmos.color = Color.yellow;
+        //    Gizmos.DrawWireSphere(transform.position, range);
 
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, range);
+        //    Vector3 rightDir = AngleToDir(transform.eulerAngles.y + angle * 0.5f);
+        //    Vector3 leftDir = AngleToDir(transform.eulerAngles.y - angle * 0.5f);
+        //    Debug.DrawRay(transform.position, rightDir * range, Color.red);
+        //    Debug.DrawRay(transform.position, leftDir * range, Color.red);
+        //}
 
-            Vector3 rightDir = AngleToDir(transform.eulerAngles.y + angle * 0.5f);
-            Vector3 leftDir = AngleToDir(transform.eulerAngles.y - angle * 0.5f);
-            Debug.DrawRay(transform.position, rightDir * range, Color.red);
-            Debug.DrawRay(transform.position, leftDir * range, Color.red);
-        }
-
-        private Vector3 AngleToDir(float angle)
-        {
-            float radian = angle * Mathf.Deg2Rad;
-            return new Vector3(Mathf.Sin(radian), 0, Mathf.Cos(radian));
-        }
+        //private Vector3 AngleToDir(float angle)
+        //{
+        //    float radian = angle * Mathf.Deg2Rad;
+        //    return new Vector3(Mathf.Sin(radian), 0, Mathf.Cos(radian));
+        //}
 
         public override void Enter()
         {
-            Debug.Log("Enter Tracking");
             fieldEnemy.agent.destination = fieldEnemy.transform.position;
-
-            StartCoroutine(TrackingRoutine());
         }
 
         public override void Update_()
         {
             if (!fieldEnemy.foundPlayer)
+            {
                 fieldEnemy.ChangeState(StateEnemy.Idle);
+            }
+
+            Tracking();
         }
 
         public override void Exit()
         {
             Debug.Log("Exit Tracking");
-            StopAllCoroutines();
+            fieldEnemy.agent.destination = fieldEnemy.patrolPoint.position;
         }
     }
 }
