@@ -29,6 +29,7 @@ public class Player : Unit
 
     public override void TakeDamage(int damage)
     {
+        animator.SetTrigger("Hit");
         base.HP -= damage;
 
         if (base.HP <= 0)

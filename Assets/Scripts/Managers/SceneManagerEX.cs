@@ -67,7 +67,7 @@ public class SceneManagerEX : MonoBehaviour
         Time.timeScale = 0f; // Loading Áß¿¡´Â ½Ã°£ ¸ØÃã
         
         loadingUI.SetProgress(0f);
-        loadingUI.FadeOut();
+        //loadingUI.FadeOut();
 
         yield return new WaitForSecondsRealtime(0.5f); // Wait fade out
 

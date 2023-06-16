@@ -79,21 +79,7 @@ public class BattleScene : BaseScene
 
     public override void Clear()
     {
-        //var players = GameObject.FindGameObjectsWithTag("Player");
-
-        //foreach (var p in players)
-        //{
-        //    p.GetComponent<PlayerMover>().enabled = true;
-        //    p.GetComponent<PlayerInteractor>().enabled = true;
-        //}
-
-        //var Enemys = GameObject.FindGameObjectsWithTag("Enemy");
-
-        //foreach (var e in Enemys)
-        //{
-        //    e.GetComponent<FieldEnemy>().enabled = true;
-        //    e.transform.Find("Canvas").gameObject.SetActive(false);
-        //}
+        
     }
 
 }

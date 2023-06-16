@@ -125,6 +125,7 @@ public class Enemy : Unit, IPointerEnterHandler, IPointerExitHandler, IPointerCl
 
     public override void TakeDamage(int damage)
     {
+        animator.SetTrigger("Hit");
 
         base.HP -= damage;
 

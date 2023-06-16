@@ -350,15 +350,18 @@ public class BattleManager : MonoBehaviour
 
     public void OnPlayerAttack()
     {
-       
+        isUseSkill = false;
         Debug.Log("Player Attack start");
         TurnRoutine = StartCoroutine(PlayerMoveAndAttack());
         MenuUI.gameObject.SetActive(false);
  
     }
 
+    bool isUseSkill = false;
     public void OnPlayerUseSkill() 
     {
+        isUseSkill = true;
+
         Debug.Log("Player Skill start");
 
         MenuUI.gameObject.SetActive(false);
@@ -390,7 +393,14 @@ public class BattleManager : MonoBehaviour
                 yield return null;
             }
 
-            nowPlayer.animator.SetTrigger("Attack");
+            if (isUseSkill == false)
+            {
+                nowPlayer.animator.SetTrigger("Attack");
+            }
+            else 
+            {
+                nowPlayer.animator.SetTrigger("Skill");
+            }
             UnitMove(targetEnemy.transform.position, nowPlayer.transform);
             yield return new WaitForSeconds(1f);
 
@@ -418,6 +428,8 @@ public class BattleManager : MonoBehaviour
             {
                 if (curentWave < maxWaveCount)
                 {
+
+                    yield return new WaitForSeconds(0.5f);
                     //wave Make
                     MakeWave(MaxTypeNum, MaxEachEnemyCount);
                 }
@@ -497,6 +509,7 @@ public class BattleManager : MonoBehaviour
     public void EnemyTurn()
     {
         SkillUI.gameObject.SetActive(false);
+        
         StopCoroutine(TurnRoutine);
 
         StartCoroutine(EnemyTurnRoutine());
@@ -504,21 +517,27 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator EnemyTurnRoutine()
     {
+        MenuUI.gameObject.SetActive(false);
         yield return new WaitForSeconds(1f);
 
         Player temp = new Player();
-        int hp = int.MaxValue;
+        //int hp = int.MaxValue;
 
-        //Find hp Lower Player
-        foreach (var player in playerUnits)
-        {
-            if (player.curHP < hp)
-            {
-                hp = player.curHP;
-                temp = player;
-            }
+        ////Find hp Lower Player
+        //foreach (var player in playerUnits)
+        //{
+        //    if (player.curHP < hp)
+        //    {
+        //        hp = player.curHP;
+        //        temp = player;
+        //    }
 
-        }
+        //}
+
+        //random Player
+        int randi = Random.Range(0, playerUnits.Count);
+        temp = playerUnits[randi];
+
 
         foreach (Enemy enemy in enemyUnits)
         {
