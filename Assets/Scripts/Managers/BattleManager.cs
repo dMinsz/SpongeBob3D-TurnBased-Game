@@ -1,7 +1,10 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEditor.PlayerSettings;
 
 
@@ -67,23 +70,27 @@ public class BattleManager : MonoBehaviour
     [HideInInspector] public PlayableDatas playerDatas;
     [HideInInspector] public EnemyDatas enemyDatas;
 
-    public List<Player> playerUnits;
-    List<Enemy> enemyUnits;
+    [HideInInspector]  public List<Player> playerUnits;
+    [HideInInspector] public List<Enemy> enemyUnits;
+
+    public CinemachineVirtualCamera[] Cams;
 
     EnemyDatas.EnemyInfo encounteredUnit; 
 
     Enemy targetEnemy;
-    public Player targetPlayer;
+    [HideInInspector] public Player targetPlayer;
 
-    public Player nowPlayer;
+    [HideInInspector] public Player nowPlayer;
 
     //Monster Wave
-    private const int MAXWAVE = 3;
-    private int waveCount = 2;
-    private int MaxEachEnemyCount = 2;
-    private int MaxTypeNum = 1;
+    private const int MAXWAVE = 3; //for Check
 
     public int curentWave = 0;
+    private int maxWaveCount = 2;
+    
+    private int MaxEachEnemyCount = 2;
+    private int MaxTypeNum = 1; // Enemy Type
+
 
     //public WaveDatas waveData; 
     public List<Wave> _wave;
@@ -91,31 +98,50 @@ public class BattleManager : MonoBehaviour
     Coroutine TurnRoutine;
 
     Transform MenuUI;
-
+    Transform SkillUI;
+    Transform EndUI;
+    TMP_Text EndText;
     private void Start()
     {
         //Menu hud Open
         GameObject canvas = GameObject.Find("BattleCanvas");
         var BattleUI = canvas.transform.Find("BattleUI");
         MenuUI = BattleUI.transform.Find("SelectMenuUI");
+
+        SkillUI = canvas.transform.Find("Skill");
+        EndUI = canvas.transform.Find("EndBackGround");
+        EndText = EndUI.GetComponentInChildren<TMP_Text>();
+
         MenuUI.gameObject.SetActive(true);
     }
 
 
-    public void SettingBattle(BattleState _state, EnemyDatas.EnemyInfo _encounteredUnit, int _waveCount)
+    public void SettingBattle(BattleState _state, int _waveMaxCount , int _EachEnemyCount , int MaxEnemytype)
     {
-        state = _state;
-        encounteredUnit = _encounteredUnit;
+        curentWave = 0;
+        maxWaveCount = _waveMaxCount;
+        MaxEachEnemyCount = _EachEnemyCount;
+        MaxTypeNum = MaxEnemytype;
 
-        if (_waveCount <= MAXWAVE)
+        state = _state;
+      
+        if (maxWaveCount > MAXWAVE)
         {
-            waveCount = _waveCount;
-        }
-        else
-        {
-            waveCount = MAXWAVE;
+            maxWaveCount = MAXWAVE;
         }
     }
+
+    #region cameraFuncs
+    public void ChangeCamera(int index) 
+    {
+        foreach (var cam in Cams)
+        {
+            cam.Priority = 1;
+        }
+
+        Cams[index].Priority = 10;
+    }
+    #endregion
 
     #region Target Funcs
     public bool IsTargeting()
@@ -172,25 +198,25 @@ public class BattleManager : MonoBehaviour
     }
 
    
-    public void MakeWave(int maxWaveCount, int maxEnemyTypeNum, int maxEachEnemyCount)
+    public void MakeWave(int maxEnemyTypeNum, int maxEachEnemyCount)
     {
 
-        if (curentWave > MAXWAVE)
+        if (curentWave > maxWaveCount)
         {
-            Debug.Log("Make Wave Too Much");
+            Debug.Log("Make Enemy Too Much");
             return;
         }
 
         
         _wave = new List<Wave>();
 
-        int curWave = 0;
+        int curMonsterCount = 0;
 
-        while (curWave < maxWaveCount)
+        while (curMonsterCount < maxEachEnemyCount)
         {
-            //int EachWaveEnemyCount = Random.Range(1, maxEachEnemyCount+1);
             //test
-            int EachWaveEnemyCount = 3;
+            int EachWaveEnemyCount = Random.Range(1, maxEachEnemyCount+1);
+            //int EachWaveEnemyCount = 3;
             int index = Random.Range(0, maxEnemyTypeNum + 1); //maxEnemyNum
 
             Wave temp = new Wave();
@@ -201,65 +227,16 @@ public class BattleManager : MonoBehaviour
 
             for (int i = 0; i < EachWaveEnemyCount; i++)
             {
-                _wave[curWave].EnemyList.Add(enemyDatas.Enemys[index]);
+                _wave[curMonsterCount].EnemyList.Add(enemyDatas.Enemys[index]);
             }
-            curWave++;
+            curMonsterCount++;
         }
-
+        InitiateEnemys();
         curentWave++;
     }
 
-    public void Setup()
+    public void InitiateEnemys() 
     {
-        //isSetUp = true;
-
-        playerUnits = new List<Player>();
-        enemyUnits = new List<Enemy>();
-
-        //Data Bind
-
-        playerDatas = GameManager.Resource.Load<PlayableDatas>("Datas/PlayableDatas");
-        enemyDatas = GameManager.Resource.Load<EnemyDatas>("Datas/EnemyDatas");
-
-
-        //debug 
-        if (encounteredUnit == null)
-        {
-            encounteredUnit = enemyDatas.enemys[0];
-        }
-
-        //wave Binding
-
-        //Test Data
-        //private int waveCount = 2;
-        //private int MaxEachEnemyCount = 2;
-        //private int MaxTypeNum = 1;
-        MakeWave(waveCount, MaxTypeNum, MaxEachEnemyCount);
-
-
-        //Init Enemy and Player
-
-
-        for (int i = 0; i < playerDatas.players.Length; i++)
-        {
-            Player temp = GameManager.Resource.Instantiate(playerDatas.players[i].PreFab, playerBattleStation[i].position, Quaternion.identity);
-            //temp.transform.position = playerBattleStation[i].position;
-
-
-            temp.unitName = playerDatas.players[i].name;
-            temp.MaxHP = playerDatas.players[i].MaxHP;
-            temp.curHP = playerDatas.players[i].MaxHP;
-            temp.MaxSP = playerDatas.players[i].MaxSP;
-            temp.curSP = playerDatas.players[i].MaxSP;
-            temp.AttackDamage = playerDatas.players[i].AttackDamage;
-            temp.SkillDamage = playerDatas.players[i].SkillDamage;
-            playerUnits.Add(temp);
-        }
-
-        nowPlayer = playerUnits[0];
-        SetTaget(playerUnits[0]);
-
-        //Enemy Position and Data Setting
         for (int i = 0; i < _wave[0].EnemyList.Count; i++)
         {
             Enemy temp = GameManager.Resource.Instantiate(_wave[0].EnemyList[i].enemyPrefab, enemyBattleStation[i].position, Quaternion.identity);
@@ -283,20 +260,71 @@ public class BattleManager : MonoBehaviour
         SetPlayersRotation();
 
         FreeTarget(enemyUnits[0]);
+    }
+    public void Setup()
+    {
+        //isSetUp = true;
+
+        playerUnits = new List<Player>();
+        enemyUnits = new List<Enemy>();
+
+        //Data Bind
+
+        playerDatas = GameManager.Resource.Load<PlayableDatas>("Datas/PlayableDatas");
+        enemyDatas = GameManager.Resource.Load<EnemyDatas>("Datas/EnemyDatas");
+
+        //Init Enemy and Player
+        for (int i = 0; i < playerDatas.players.Length; i++)
+        {
+            Player temp = GameManager.Resource.Instantiate(playerDatas.players[i].PreFab, playerBattleStation[i].position, Quaternion.identity);
+            //temp.transform.position = playerBattleStation[i].position;
+
+
+            temp.unitName = playerDatas.players[i].name;
+            temp.MaxHP = playerDatas.players[i].MaxHP;
+            temp.curHP = playerDatas.players[i].MaxHP;
+            temp.MaxSP = playerDatas.players[i].MaxSP;
+            temp.curSP = playerDatas.players[i].MaxSP;
+            temp.AttackDamage = playerDatas.players[i].AttackDamage;
+            temp.SkillDamage = playerDatas.players[i].SkillDamage;
+            playerUnits.Add(temp);
+        }
+
+        nowPlayer = playerUnits[0];
+        SetTaget(playerUnits[0]);
+
+        //Enemy Position and Data Setting
+        MakeWave(MaxTypeNum, MaxEachEnemyCount);
+
 
         if (state == BattleState.START)
         {
-            TurnRoutine = StartCoroutine(EnemyTurn());
+            TurnRoutine = StartCoroutine(EnemyTurnRoutine());
         }
     }
 
 
     public Player NextPlayer() 
     {
-        int index = playerUnits.FindIndex(x => nowPlayer);
-        if (index < playerUnits.Count - 1)
+        int index = playerUnits.FindIndex(x => x == nowPlayer);
+
+        if (index < 0)
+            Debug.Log("NextPlayer() Now Player Not Found");
+
+        if (index < playerUnits.Count )
         {
-            return playerUnits[index + 1];
+            for (int i = index; i < playerUnits.Count ; i++)
+            {
+                if (index + 1 >= playerUnits.Count)
+                {
+                    return null;
+                }
+
+                if(!playerUnits[index + 1].IsDie())
+                        return playerUnits[index + 1];
+            }
+
+            return null;
         }
         else 
         {
@@ -304,9 +332,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public Player FirstPlayer() 
+    
+    public Player AlivePlayer()
     {
-        foreach (Player player in playerUnits) 
+        foreach (Player player in playerUnits)
         {
             if (player.IsDie() == false)
             {
@@ -327,9 +356,29 @@ public class BattleManager : MonoBehaviour
  
     }
 
-    bool isPlayerAttackDone = false;
+    public void OnPlayerUseSkill() 
+    {
+        Debug.Log("Player Skill start");
+
+        MenuUI.gameObject.SetActive(false);
+
+        SkillUI.gameObject.SetActive(true);
+
+        int index = playerUnits.FindIndex(x => x == nowPlayer);
+        SkillUI.transform.GetComponentInChildren<Image>().sprite = playerDatas.players[index].SkillImage;
+
+
+        TurnRoutine = StartCoroutine(PlayerMoveAndAttack());
+
+
+    }
+
+    //bool isPlayerAttackDone = false;
     IEnumerator PlayerMoveAndAttack() 
     {
+        yield return new WaitForSeconds(0.5f);
+        SkillUI.gameObject.SetActive(false);
+
         while (true)
         {
             Vector3 tempPos = nowPlayer.transform.position;
@@ -357,16 +406,17 @@ public class BattleManager : MonoBehaviour
             UnitMove(tempPos, nowPlayer.transform);
             yield return new WaitForSeconds(0.2f);
 
-            isPlayerAttackDone = true;
+            //isPlayerAttackDone = true;
             //MenuUI.gameObject.SetActive(true);
             Debug.Log("Player Attack Done");
 
 
             if (enemyUnits.Count <= 0)
             {
-                if (curentWave <= waveCount)
+                if (curentWave < maxWaveCount)
                 {
                     //wave Make
+                    MakeWave(MaxTypeNum, MaxEachEnemyCount);
                 }
                 else 
                 {
@@ -377,18 +427,19 @@ public class BattleManager : MonoBehaviour
 
             //next Player
             Player next = NextPlayer();
+
             if (next != null)
             {
                 nowPlayer = next;
                 PlayerTurn();
+                break;
             }
             else 
             {
                 MenuUI.gameObject.SetActive(false);
-                TurnRoutine = StartCoroutine(EnemyTurn());
+                EnemyTurn();
+                break;
             }
-
-            break;
         }
        
     }
@@ -405,6 +456,10 @@ public class BattleManager : MonoBehaviour
 
         //Player Cameara Setting
 
+        int index = playerUnits.FindIndex(x => x == nowPlayer);
+
+        ChangeCamera(index);
+
     }
 
     bool IsMovedone = false;
@@ -417,7 +472,7 @@ public class BattleManager : MonoBehaviour
             Vector3 dir = (target - moveUnit.position).normalized;
             float speed = 1f;
             var attackRange = 2;
-            //moveUnit.position += dir * speed * Time.deltaTime;
+
             moveUnit.transform.Translate(dir * speed * Time.deltaTime, Space.World);
             var distance = Vector3.Distance(target, moveUnit.position);
 
@@ -433,9 +488,15 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    IEnumerator EnemyTurn()
+    public void EnemyTurn()
     {
-        //MenuUI.gameObject.SetActive(false);
+        StopCoroutine(TurnRoutine);
+
+        StartCoroutine(EnemyTurnRoutine());
+    }
+
+    IEnumerator EnemyTurnRoutine()
+    {
         yield return new WaitForSeconds(0.2f);
 
         Player temp = new Player();
@@ -480,7 +541,7 @@ public class BattleManager : MonoBehaviour
 
         state = BattleState.PLAYERTURN;
 
-        Player next = FirstPlayer();
+        Player next = AlivePlayer();
         
         if (next != null) 
         { 
@@ -501,10 +562,13 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle Done");
         if (state == BattleState.WON)
         {
-
+            EndUI.gameObject.SetActive(true);
+            EndText.text = "You Win";
         }
         else if (state == BattleState.LOST)
         {
+            EndUI.gameObject.SetActive(true);
+            EndText.text = "You Lost";
         }
     }
 }

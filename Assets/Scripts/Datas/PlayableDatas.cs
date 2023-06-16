@@ -17,7 +17,7 @@ public class PlayableDatas : ScriptableObject
         public Player PreFab;
 
         public Sprite CharacterIamge;
-
+        public Sprite SkillImage;
         [Header("Status")]
         public string name;
         public int MaxHP;

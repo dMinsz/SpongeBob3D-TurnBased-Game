@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BattleMenuUI : BaseUI, IPointerEnterHandler, IPointerExitHandler
+public class BattleMenuUI : BaseUI, IPointerEnterHandler, IPointerExitHandler , IPointerClickHandler
 {
     public TMP_Text text;
     public Image back;
@@ -27,6 +27,13 @@ public class BattleMenuUI : BaseUI, IPointerEnterHandler, IPointerExitHandler
     }
 
     public void OnPointerExit(PointerEventData eventData)
+    {
+        text.fontSize = 30;
+        text.color = Color.black;
+        back.gameObject.SetActive(false);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
     {
         text.fontSize = 30;
         text.color = Color.black;
