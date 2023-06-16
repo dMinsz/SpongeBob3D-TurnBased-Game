@@ -27,7 +27,7 @@ public class PlayerInteractor : MonoBehaviour
 
         foreach (Collider collider in colliders)
         {
-            if(collider.tag != "Enemy")
+            if(collider.tag != "Enemy" && collider.tag != "Player")
             {
                 IInteractable interactable = collider.GetComponent<IInteractable>();
                 interactable?.Interact();
